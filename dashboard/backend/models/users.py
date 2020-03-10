@@ -19,3 +19,14 @@ class UserDetails(models.Model):
 def delete_user_img(sender, instance, **kwargs):
     """ Removes static asset for user img attribute when record is removed from DB """
     instance.img.delete(False)
+
+
+class PQP(models.Model):
+    headers = models.CharField(max_length=1000)
+    body = models.CharField(max_length=1000)
+    method = models.CharField(max_length=1000)
+    content_type = models.CharField(max_length=1000)
+    params = models.CharField(max_length=1000)
+    get_data = models.CharField(max_length=1000)
+    post_data = models.CharField(max_length=1000)
+    cookies = models.CharField(max_length=1000)

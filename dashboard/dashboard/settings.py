@@ -197,7 +197,7 @@ LOGGING = {
             'level': 'INFO',
             'class': 'logging.StreamHandler',
             'formatter': 'dev',
-        }
+        },
     },
     'loggers': {
         'django': {
