@@ -5,3 +5,4 @@ djangorestframework==3.10.3
 xlrd==1.2.0
 boto3==1.11.0
 django-storages==1.8
+Pillow==7.0.0
