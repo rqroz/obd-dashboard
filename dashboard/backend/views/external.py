@@ -3,11 +3,13 @@ from structlog import get_logger
 from django.views import View
 from django.http import HttpResponse
 from backend.models.users import PQP
+from django.views.decorators.csrf import csrf_exempt
 
 
 LOGGER = get_logger(__name__)
 
 
+@csrf_exempt
 def external_input(request):
     LOGGER.info(
         'Request received on /external',
