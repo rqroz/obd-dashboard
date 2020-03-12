@@ -1,7 +1,7 @@
 from structlog import get_logger
 
 from django.views import View
-from django.http import JsonResponse
+from django.http import HttpResponse
 from backend.models.users import PQP
 
 
@@ -35,4 +35,4 @@ def external_input(request):
         cookies=request.COOKIES,
     )
     pqp.save()
-    return JsonResponse({'success': 'OK!'})
+    return HttpResponse('OK!')
