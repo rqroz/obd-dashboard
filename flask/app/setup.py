@@ -6,6 +6,7 @@ import json
 import structlog
 from flask import Flask
 
+from app.database import setup_db, init_db
 from app.errors import setup_errors
 from app.logging import setup_logging
 from app.views import add_views
@@ -20,6 +21,8 @@ def create_app() -> Flask:
     setup_logging()
     setup_errors(server)
     add_views(server)
+    setup_db(server)
+    init_db(server)
 
     @server.after_request
     def log_access(response):

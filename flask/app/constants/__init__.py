@@ -17,3 +17,4 @@ class Defaults:
         NAME = 'dashboard_db'
         USER = 'test'
         PASS = 'test'
+        SQLITE = True
