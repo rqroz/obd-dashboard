@@ -11,6 +11,12 @@ from app.errors import setup_errors
 from app.logging import setup_logging
 from app.views import add_views
 
+# Importing models so that DB is initialized
+from app.models import (
+    obd,
+    user,
+)
+
 
 def create_app() -> Flask:
     server = Flask(
