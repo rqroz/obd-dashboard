@@ -64,6 +64,15 @@ class OBDSensorValue(DATABASE.Model, DictDataModel):
     __tablename__ = "obd_sensor_value"
 
     id = Column(Integer, primary_key=True)
-    su = Column(Integer, ForeignKey(OBDSensorUser.id))
+    sensor_user_id = Column(Integer, ForeignKey(OBDSensorUser.id))
+    session_id = Column(String(15), nullable=False)
     value = Column(Numeric, nullable=False)
     date = Column(DateTime, default=datetime.datetime.utcnow)
+
+    sensor_user = relationship(OBDSensorUser, uselist=False)
+
+    def to_dict(self, include_protected=False):
+        data = super(OBDSensorValue, self).to_dict(include_protected)
+        data.pop('sensor_user_id')
+        data['sensor_user'] = self.sensor_user.to_dict()
+        return data

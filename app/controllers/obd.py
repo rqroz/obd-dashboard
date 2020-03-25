@@ -1,5 +1,6 @@
 import re
 
+from typing import List
 from structlog import get_logger
 from flask import g
 
@@ -32,11 +33,77 @@ class OBDController:
     PREFIXES = OBDSensorPrefixes
 
     def __init__(self, db_session=None):
+        """ Class Constructor """
         if db_session is None:
             db_session = g.db_session
         self.db_session = db_session
 
-    def get_or_create_sensor(self, label: str, full_name: str, short_name: str):
+    def _resolve_user(self, data: dict):
+        """
+        Resolves user from data.
+
+        Raises:
+            - OBDControllerError:
+                If user email is not found in <data>;
+                If there is no user corresponding to the email found in <data>;
+
+        Args:
+            - data (dict): Map of arguments received by TORQUE request.
+
+        Returns:
+            - user (app.models.user.User): User instance.
+        """
+        user_email = data.get('eml')
+        if not user_email:
+            raise OBDControllerError('User email not found')
+
+        user: User = self.db_session.query(User).filter(User.email == user_email).first()
+        if not user:
+            raise OBDControllerError('User does not exist')
+
+        return user
+
+    def _get_unit(self, label: str):
+        """
+        OBDSensorUnit: Get method.
+        Will fetch the first item matching label.
+
+        Args:
+            - label (str): Label identifying record.
+
+        Returns:
+            (app.models.obd.OBDSensorUnit | None): First item matching label, if any. None otherwise.
+        """
+        return self.db_session.query(OBDSensorUnit).filter(OBDSensorUnit.label == label).first()
+
+    def _get_sensor(self, label: str):
+        """
+        OBDSensor: Get method.
+        Will fetch the first item matching label.
+
+        Args:
+            - label (str): Label identifying record.
+
+        Returns:
+            (app.models.obd.OBDSensor | None): First item matching label, if any. None otherwise.
+        """
+        return self.db_session.query(OBDSensor).filter(OBDSensor.label == label).first()
+
+    def _get_sensor_user(self, **kwargs):
+        """
+        OBDSensorUser: Get method.
+        Will fetch the first item matching keyword arguments informed.
+
+        Returns:
+            (app.models.obd.OBDSensorUser | None): First item matching kwargs, if any. None otherwise.
+        """
+        return (
+            self.db_session.query(OBDSensorUser)
+                            .filter(*[getattr(OBDSensorUser, key) == value for key, value in kwargs.items()])
+                            .first()
+        )
+
+    def _get_or_create_sensor(self, label: str, full_name: str, short_name: str):
         """
         OBDSensor: Get or Create method.
         Will try to resolve an OBDSensor instance by a match with the label informed.
@@ -50,7 +117,7 @@ class OBDController:
         Returns:
             - unit (app.models.obd.OBDSensorUnit): Resolved instance of OBDSensorUnit.
         """
-        sensor: OBDSensor = self.db_session.query(OBDSensor).filter(OBDSensor.label == label).first()
+        sensor: OBDSensor = self._get_sensor(label)
         if not sensor:
             sensor = OBDSensor(label=label, full_name=full_name, short_name=short_name)
             self.db_session.add(sensor)
@@ -58,7 +125,7 @@ class OBDController:
 
         return sensor
 
-    def get_or_create_unit(self, label: str):
+    def _get_or_create_unit(self, label: str):
         """
         OBDSensorUnit: Get or Create method.
         Will try to resolve an OBDSensorUnit instance by a match with the label informed.
@@ -70,7 +137,7 @@ class OBDController:
         Returns:
             - unit (app.models.obd.OBDSensorUnit): Resolved instance of OBDSensorUnit.
         """
-        unit: OBDSensorUnit = self.db_session.query(OBDSensorUnit).filter(OBDSensorUnit.label == label).first()
+        unit: OBDSensorUnit = self._get_unit(label)
         if not unit:
             unit = OBDSensorUnit(label=label)
             self.db_session.add(unit)
@@ -78,7 +145,7 @@ class OBDController:
 
         return unit
 
-    def get_or_create_sensor_user(self, user: User, sensor: OBDSensor, unit: OBDSensorUnit):
+    def _get_or_create_sensor_user(self, user: User, sensor: OBDSensor, unit: OBDSensorUnit):
         """
         OBDSensorUser: Get or Create method.
         Will try to resolve an OBDSensorUser instance by a match with all of the arguments.
@@ -92,15 +159,7 @@ class OBDController:
         Returns:
             - obd_sensor_user (app.models.obd.OBDSensorUser): Resolved instance of OBDSensorUser.
         """
-        obd_sensor_user: OBDSensorUser = (
-            self.db_session.query(OBDSensorUser)
-                            .filter(
-                                OBDSensorUser.user_id == user.id,
-                                OBDSensorUser.sensor_id == sensor.id,
-                                OBDSensorUser.unit_id == unit.id,
-                            )
-                            .first()
-        )
+        obd_sensor_user: OBDSensorUser = self._get_sensor_user(user_id=user.id, sensor_id=sensor.id, unit_id=unit.id)
         if not obd_sensor_user:
             obd_sensor_user = OBDSensorUser(user_id=user.id, sensor_id=sensor.id, unit_id=unit.id)
             self.db_session.add(obd_sensor_user)
@@ -108,38 +167,69 @@ class OBDController:
 
         return obd_sensor_user
 
-    def register_sensor_list(self, labels, data):
+    def _register_sensor_list(self, labels: List[str], data: dict):
         """
         Will loop through the list of labels for the sensors and create the corresponding records in the database.
         Recovers the result OBDSensorUser object for each label and log its data as INFO.
 
-        Raises:
-            - OBDControllerError:
-                If user email is not found in <data>;
-                If there is no user corresponding to the email found in <data>;
-
         Args:
-            - labels ([str]): List of labels identifying the sensors;
+            - labels (List[str]): List of labels identifying the sensors;
             - data (dict): Supporting data containing information such as long name, short name, and unit
                            for each of the sensors specified by <labels>.
         """
-        user_email = data.get('eml')
-        if not user_email:
-            raise OBDControllerError('User email not found')
-
-        user: User = self.db_session.query(User).filter(User.email == user_email).first()
-        if not user:
-            raise OBDControllerError('User does not exist')
-
+        user = self._resolve_user(data)
         for label in labels:
-            sensor = self.get_or_create_sensor(
+            sensor = self._get_or_create_sensor(
                 label,
                 data.get(f'{self.PREFIXES.FULL_NAME}{label}'),
                 data.get(f'{self.PREFIXES.SHORT_NAME}{label}'),
             )
-            unit = self.get_or_create_unit(data.get(f'{self.PREFIXES.UNIT}{label}'))
-            obd_sensor_user = self.get_or_create_sensor_user(user, sensor, unit)
+            unit = self._get_or_create_unit(data.get(f'{self.PREFIXES.UNIT}{label}'))
+            obd_sensor_user = self._get_or_create_sensor_user(user, sensor, unit)
             LOGGER.info('Resolved OBDSensorUser', **obd_sensor_user.to_dict())
+
+        self.db_session.commit()
+
+    def _register_sensor_values(self, data: dict):
+        """
+        Will loop through the list of sensor values resolved from <data> and register a OBDSensorValue record for
+        any sensor that is attached to the user (also specified in <data>).
+
+        Args:
+            - data (dict): Map of values originated from TORQUE request.
+        """
+        user = self._resolve_user(data)
+        session_id = data.get('session')
+        if not session_id:
+            raise OBDControllerError('Session is not specified')
+
+        sensor_keys = list(filter(re.compile(f'{self.PREFIXES.SENSOR}.*').match, data.keys()))
+        for sensor_key in sensor_keys:
+            sensor_label = sensor_key.replace(self.PREFIXES.SENSOR, '')
+            sensor = self._get_sensor(sensor_label)
+            if not sensor:
+                # If current sensor does not exist, skip it
+                continue
+
+            sensor_user = self._get_sensor_user(user_id=user.id, sensor_id=sensor.id)
+            if not sensor_user:
+                # If current sensor is not attached to the user, skip it
+                continue
+
+            obd_sensor_value = OBDSensorValue(
+                sensor_user_id=sensor_user.id,
+                session_id=session_id,
+                value=data[sensor_key],
+            )
+            LOGGER.info(
+                'Registering value to sensor',
+                user=user.id,
+                name=sensor.full_name,
+                sensor=sensor.label,
+                value=obd_sensor_value.value,
+                session=session_id,
+            )
+            self.db_session.add(obd_sensor_value)
 
         self.db_session.commit()
 
@@ -156,7 +246,7 @@ class OBDController:
         if full_name_keys:
             # Register Params
             labels = [full_name_key.replace(self.PREFIXES.FULL_NAME, '') for full_name_key in full_name_keys]
-            self.register_sensor_list(labels, data)
+            self._register_sensor_list(labels, data)
         else:
             # Register Values
-            pass
+            self._register_sensor_values(data)

@@ -11,5 +11,5 @@ import app.views.obd as obd
 def add_views(app: Flask):
     """ Adds all of the views to the application """
     health.HealthViews.add_views(app)
-    index.IndexViews.add_views(app)
     obd.OBDViews.add_views(app)
+    index.IndexViews.add_views(app)

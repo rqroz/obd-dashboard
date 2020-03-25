@@ -16,7 +16,7 @@ DATABASE = SQLAlchemy()
 
 def get_db_uri():
     if DBConfig.SQLITE:
-        return 'sqlite:///../db.sqbpro'
+        return 'sqlite:///../db.sqlite3'
 
     return f'mysql://{DBConfig.USER}:{DBConfig.PASS}@{DBConfig.HOST}:{DBConfig.PORT}/{DBConfig.NAME}'
 
