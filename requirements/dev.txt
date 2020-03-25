@@ -1,0 +1,3 @@
+-r test.txt
+
+requests==2.23.0
