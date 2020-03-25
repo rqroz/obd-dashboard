@@ -9,7 +9,6 @@ import structlog
 from flask import request
 
 from app.config import Config
-from app.constants import Environments
 
 
 class RequestContext(logging.Filter):
@@ -46,7 +45,7 @@ def setup_logging():
             },
             'dev': {
                 '()': structlog.stdlib.ProcessorFormatter,
-                'processor': structlog.dev.ConsoleRenderer(colors=(Config.ENVIRONMENT == Environments.LOCAL)),
+                'processor': structlog.dev.ConsoleRenderer(colors=True),
                 'foreign_pre_chain': pre_chain,
             }
         },

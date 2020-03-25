@@ -5,3 +5,4 @@ structlog==20.1.0
 colorama==0.4.3
 logstash-formatter==0.5.17
 flask-sqlalchemy==2.4.1
+requests==2.23.0

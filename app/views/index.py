@@ -13,7 +13,7 @@ class IndexViews:
     @classmethod
     def add_views(cls, server):
         server.add_url_rule("/", defaults={'path': ''}, view_func=cls.index_view)
-        server.add_url_rule("/js/<path:path>", view_func=cls.index_view)
+        server.add_url_rule("/<path:path>", view_func=cls.index_view)
 
     def index_view(path):
         if Config.ENVIRONMENT == Environments.LOCAL:
