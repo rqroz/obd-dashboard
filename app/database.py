@@ -18,7 +18,7 @@ def get_db_uri():
     if DBConfig.SQLITE:
         return 'sqlite:///../db.sqlite3'
 
-    return f'mysql://{DBConfig.USER}:{DBConfig.PASS}@{DBConfig.HOST}:{DBConfig.PORT}/{DBConfig.NAME}'
+    return f'postgresql+psycopg2://{DBConfig.USER}:{DBConfig.PASS}@{DBConfig.HOST}:{DBConfig.PORT}/{DBConfig.NAME}'
 
 
 def setup_db(app: Flask):

@@ -14,7 +14,7 @@ class Defaults:
 
     class DB:
         HOST = 'localhost'
-        PORT = '3306'
+        PORT = '5432'
         NAME = 'dashboard_db'
         USER = 'test'
         PASS = 'test'
