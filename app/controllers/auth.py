@@ -1,9 +1,13 @@
 """
 Authentication controller
 """
+import jwt
+import datetime
+
 from bcrypt import checkpw, gensalt, hashpw
 from marshmallow import ValidationError
 
+from app.config import Config
 from app.controllers import BaseUserController
 from app.controllers.user import UserController
 from app.utils.exceptions import DictException
@@ -33,3 +37,12 @@ class AuthController(object):
             raise AuthControllerException({'invalid': 'Incorrect user and/or password'})
 
         return user
+
+    def get_token(self, user):
+        return jwt.encode(
+            {
+                'public_id': user.public_id,
+                'exp' : datetime.datetime.utcnow() + datetime.timedelta(minutes=30)
+            },
+            Config.SECRET_KEY,
+        )

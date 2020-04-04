@@ -8,6 +8,7 @@ class Environments:
 
 
 class Defaults:
+    SECRET_KEY = 'my-secret-key'
     ENVIRONMENT = Environments.LOCAL
     LOG_LEVEL = 'DEBUG'
     FRONTEND_DIR = './static/dist/'

@@ -48,7 +48,6 @@ export default {
   }),
   methods: {
     successHandler(response) {
-      console.log(response);
       this.$store.dispatch(DEFINE_USER, { user: response.data.user });
     },
     errorHandler(error) {
