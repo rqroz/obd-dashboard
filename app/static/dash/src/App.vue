@@ -2,12 +2,17 @@
   <v-app>
     <v-navigation-drawer app clipped :mini-variant="mini">
       <v-list dense>
-        <v-list-item link>
+        <v-list-item
+          link
+          v-for="item in navigationItems"
+          :key="item.label"
+          :to="item.route"
+        >
           <v-list-item-action>
-            <v-icon>mdi-view-dashboard</v-icon>
+            <v-icon>{{ item.icon }}</v-icon>
           </v-list-item-action>
           <v-list-item-content>
-            <v-list-item-title>Control Panel</v-list-item-title>
+            <v-list-item-title>{{ item.label }}</v-list-item-title>
           </v-list-item-content>
         </v-list-item>
       </v-list>
@@ -19,7 +24,7 @@
     </v-app-bar>
 
     <v-content>
-      <v-container class="fill-height">
+      <v-container>
         <router-view />
       </v-container>
     </v-content>
@@ -31,11 +36,18 @@
 </template>
 
 <script>
-  export default {
-    data: () => ({
-      mini: true,
-      title: 'OBD II - Dashboard',
-      year: (new Date()).getFullYear(),
-    }),
-  }
+import NAVIGATION_ITEMS from '@/resources/navigation/drawer';
+
+export default {
+  data: () => ({
+    mini: true,
+    title: 'OBD II - Dashboard',
+    year: (new Date()).getFullYear(),
+  }),
+  computed: {
+    navigationItems() {
+      return this.$store.getters.user ? NAVIGATION_ITEMS.auth : NAVIGATION_ITEMS.unauth;
+    },
+  },
+}
 </script>
