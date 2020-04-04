@@ -1,5 +1,5 @@
 <template>
-  <v-form ref="form" v-model="valid">
+  <v-form ref="form" v-model="valid" @keyup.native.enter="submit">
     <v-row>
       <v-col>
         <v-text-field
@@ -42,7 +42,7 @@
     </v-row>
     <v-row>
       <v-col class="d-flex justify-end">
-        <v-btn color="primary" :disabled="!valid" @click="validate">
+        <v-btn color="primary" :disabled="!valid" @click="submit">
           <v-icon class="mr-1">mdi-login</v-icon>
           Register
         </v-btn>
@@ -52,13 +52,14 @@
 </template>
 
 <script>
+import formMixin from '@/mixins/formMixin';
 import FORM_RULES from '@/resources/forms/rules';
 
 export default {
+  mixins: [formMixin],
   data() {
     return {
-      secret: true,
-      valid: false,
+      endpoint: '/register/',
       model: {
         first_name: '',
         last_name: '',
@@ -66,6 +67,7 @@ export default {
         password: '',
         confirmPassword: '',
       },
+      secret: true,
       rules: {
         email: FORM_RULES.email,
         passwordLength: FORM_RULES.passwordLength,
@@ -73,15 +75,16 @@ export default {
         passwordsMatch: value => value === this.model.password || 'The passwords don\'t match',
         nameLength: value => value.length >= 5 || 'This field must have at least 5 characters',
       },
+      valid: false,
     };
   },
-
   methods: {
-    validate () {
-      if (!this.$refs.form.validate()) { return; }
-
-      // TODO: Use requests to apply registration
+    successHandler(response) {
+      console.log(response);
     },
+    errorHandler(error) {
+      console.log(error);
+    }
   },
 }
 </script>

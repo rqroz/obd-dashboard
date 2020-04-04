@@ -1,5 +1,5 @@
 <template>
-  <v-form ref="form" v-model="valid">
+  <v-form ref="form" v-model="valid" @keyup.native.enter="submit">
     <v-row>
       <v-col>
         <v-text-field
@@ -22,7 +22,7 @@
     </v-row>
     <v-row>
       <v-col class="d-flex justify-end">
-        <v-btn color="primary" :disabled="!valid" @click="validate">
+        <v-btn color="primary" :disabled="!valid" @click="submit">
           <v-icon class="mr-1">mdi-login-variant</v-icon>
           Enter
         </v-btn>
@@ -32,26 +32,28 @@
 </template>
 
 <script>
+import formMixin from '@/mixins/formMixin';
 import FORM_RULES from '@/resources/forms/rules';
 
 export default {
+  mixins: [formMixin],
   data: () => ({
-    secret: true,
-    valid: false,
+    endpoint: '/login/',
     model: {
       email: '',
       password: '',
     },
     rules: FORM_RULES,
+    secret: true,
+    valid: false,
   }),
-
   methods: {
-    validate () {
-      if (!this.$refs.form.validate()) { return; }
-
-      // TODO: Use requests to apply registration
-      console.log(this.$requests);
+    successHandler(response) {
+      console.log(response);
     },
+    errorHandler(error) {
+      console.log(error);
+    }
   },
 }
 </script>

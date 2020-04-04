@@ -2,7 +2,7 @@
 OBD-specific views.
 """
 from structlog import get_logger
-from flask import jsonify, request
+from flask import request
 
 from app.controllers.obd import OBDController, OBDControllerError
 
