@@ -1,62 +1,59 @@
 <template>
-  <v-form ref="form" v-model="valid" @keyup.native.enter="submit">
-    <v-row>
-      <v-col>
-        <v-text-field
-          v-model="model.first_name"
-          :rules="[rules.required, rules.nameLength]"
-          label="First Name"
-          counter
-        />
-        <v-text-field
-          v-model="model.last_name"
-          :rules="[rules.required, rules.nameLength]"
-          label="Last Name"
-          counter
-        />
-        <v-text-field
-          v-model="model.email"
-          :rules="[rules.required, rules.email]"
-          label="E-mail"
-          required
-        />
-        <v-text-field
-          v-model="model.password"
-          :append-icon="secret ? 'mdi-eye-off' : 'mdi-eye'"
-          :rules="[rules.required, rules.passwordLength]"
-          :type="secret ? 'password' : 'text'"
-          label="Password"
-          counter
-          @click:append="secret = !secret"
-        />
-        <v-text-field
-          v-model="model.confirmPassword"
-          :append-icon="secret ? 'mdi-eye-off' : 'mdi-eye'"
-          :rules="[rules.required, rules.passwordLength, rules.passwordsMatch]"
-          :type="secret ? 'password' : 'text'"
-          label="Confirm Password"
-          counter
-          @click:append="secret = !secret"
-        />
-      </v-col>
-    </v-row>
-    <v-row>
-      <v-col class="d-flex justify-end">
-        <v-btn color="primary" :disabled="!valid" @click="submit">
-          <v-icon class="mr-1">mdi-login</v-icon>
-          Register
-        </v-btn>
-      </v-col>
-    </v-row>
-  </v-form>
+  <form-base
+    btn-text="Register"
+    btn-icon="mdi-login-variant"
+    :endpoint="endpoint"
+    :model="model"
+    @success="successHandler"
+    @error="errorHandler"
+  >
+    <v-text-field
+      v-model="model.first_name"
+      :rules="[rules.required, rules.nameLength]"
+      label="First Name"
+      counter
+    />
+    <v-text-field
+      v-model="model.last_name"
+      :rules="[rules.required, rules.nameLength]"
+      label="Last Name"
+      counter
+    />
+    <v-text-field
+      v-model="model.email"
+      :rules="[rules.required, rules.email]"
+      label="E-mail"
+      required
+    />
+    <v-text-field
+      v-model="model.password"
+      :append-icon="secret ? 'mdi-eye-off' : 'mdi-eye'"
+      :rules="[rules.required, rules.passwordLength]"
+      :type="secret ? 'password' : 'text'"
+      label="Password"
+      counter
+      @click:append="secret = !secret"
+    />
+    <v-text-field
+      v-model="model.confirmPassword"
+      :append-icon="secret ? 'mdi-eye-off' : 'mdi-eye'"
+      :rules="[rules.required, rules.passwordLength, rules.passwordsMatch]"
+      :type="secret ? 'password' : 'text'"
+      label="Confirm Password"
+      counter
+      @click:append="secret = !secret"
+    />
+  </form-base>
 </template>
 
 <script>
-import formMixin from '@/mixins/formMixin';
+import FormBase from '@/components/forms/Base';
 import FORM_RULES from '@/resources/forms/rules';
 
 export default {
-  mixins: [formMixin],
+  components: {
+    FormBase,
+  },
   data() {
     return {
       endpoint: '/register/',
@@ -75,7 +72,6 @@ export default {
         passwordsMatch: value => value === this.model.password || 'The passwords don\'t match',
         nameLength: value => value.length >= 5 || 'This field must have at least 5 characters',
       },
-      valid: false,
     };
   },
   methods: {
