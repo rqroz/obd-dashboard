@@ -27,8 +27,11 @@
 </template>
 
 <script>
+import { DEFINE_USER } from '@/store/modules/user/actions';
+
 import FormBase from '@/components/forms/Base';
 import FORM_RULES from '@/resources/forms/rules';
+
 
 export default {
   components: {
@@ -46,6 +49,7 @@ export default {
   methods: {
     successHandler(response) {
       console.log(response);
+      this.$store.dispatch(DEFINE_USER, { user: response.data.user });
     },
     errorHandler(error) {
       console.log(error);
