@@ -22,29 +22,7 @@
       <v-app-bar-nav-icon @click.stop="mini = !mini" />
       <v-toolbar-title>{{ title }}</v-toolbar-title>
       <v-spacer/>
-      <v-dialog v-if="user" v-model="logoutDialog" persistent width="500">
-          <template v-slot:activator="{ on }">
-            <v-btn text v-on="on">
-              <v-icon>mdi-logout</v-icon>
-              Logout
-            </v-btn>
-          </template>
-
-          <v-card>
-            <v-card-title primary-title>
-              Are you sure you want to log out?
-            </v-card-title>
-            <v-card-actions>
-              <v-spacer></v-spacer>
-              <v-btn color="primary" text @click="logoutDialog = false">
-                Go Back
-              </v-btn>
-              <v-btn color="error" text @click="logout">
-                Yes, log me out
-              </v-btn>
-            </v-card-actions>
-          </v-card>
-        </v-dialog>
+      <auth-logout v-if="user" />
     </v-app-bar>
 
     <v-content>
@@ -53,22 +31,25 @@
       </v-container>
     </v-content>
 
-    <v-footer app class="overline" style="min-height: 36px !important;">
-      &copy; {{year}} Rodolfo Queiroz
-    </v-footer>
+    <base-footer />
   </v-app>
 </template>
 
 <script>
-import { CLEAR_USER } from '@/store/modules/user/actions';
 import NAVIGATION_ITEMS from '@/resources/navigation/drawer';
 
+import BaseFooter from '@/components/base/Footer';
+import AuthLogout from '@/components/auth/Logout';
+
+
 export default {
+  components: {
+    AuthLogout,
+    BaseFooter,
+  },
   data: () => ({
     mini: true,
-    logoutDialog: false,
     title: 'OBD II - Dashboard',
-    year: (new Date()).getFullYear(),
   }),
   computed: {
     user() {
@@ -76,16 +57,6 @@ export default {
     },
     navigationItems() {
       return this.user ? NAVIGATION_ITEMS.auth : NAVIGATION_ITEMS.unauth;
-    },
-  },
-  methods: {
-    logout() {
-      this.$requests.post('/logout/')
-        .then(() => {
-          this.$store.dispatch(CLEAR_USER);
-          this.logoutDialog = false
-        })
-        .catch((error) => console.log(error.response));
     },
   },
 }
