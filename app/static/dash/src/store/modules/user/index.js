@@ -19,7 +19,7 @@ export default {
       localStorage.user = JSON.stringify(user);
     },
     [UNSET_USER](state) {
-      state.paymentMethods = [];
+      state.user = null;
       localStorage.removeItem('user');
     },
   },

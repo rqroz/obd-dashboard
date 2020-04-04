@@ -3,14 +3,14 @@ export default {
     {
       icon: 'mdi-view-dashboard',
       label: 'Control Panel',
-      route: { name: 'Home' },
+      route: { name: 'Dashboard' },
     },
   ],
   unauth: [
     {
       icon: 'mdi-home',
       label: 'Home',
-      route: { name: 'Home' },
+      route: { name: 'Index' },
     },
   ],
 };

@@ -19,7 +19,6 @@ import Login from './Login'
 import Registration from './Registration'
 
 export default {
-  name: 'Home',
   components: {
     Login,
     Registration,

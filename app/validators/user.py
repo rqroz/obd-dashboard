@@ -15,8 +15,6 @@ class UserCreateSchema(Schema):
 
     @pre_load
     def make_data(self, data, **kwargs):
-        from pprint import pprint
-        pprint(data)
         data['email'] = data.pop('email').lower().strip()
         data['first_name'] = data.pop('first_name').strip()
         data['last_name'] = data.pop('last_name').strip()
