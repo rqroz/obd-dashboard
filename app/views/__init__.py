@@ -3,10 +3,13 @@ All of the views
 """
 from flask import Flask
 
-import app.views.auth as auth
-import app.views.index as index
-import app.views.health as health
-import app.views.obd as obd
+from app.views import (
+    auth,
+    index,
+    health,
+    obd,
+    user,
+)
 
 
 def add_views(app: Flask):
@@ -15,3 +18,4 @@ def add_views(app: Flask):
     health.HealthViews.add_views(app)
     index.IndexViews.add_views(app)
     obd.OBDViews.add_views(app)
+    user.UserViews.add_views(app)

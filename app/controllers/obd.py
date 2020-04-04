@@ -1,10 +1,13 @@
+"""
+OBD Controller
+"""
 import re
 
 from typing import List
 from structlog import get_logger
-from flask import g
 
 from app.constants.obd import OBDSensorPrefixes
+from app.controllers import BaseController
 from app.models.obd import (
     OBDSensorUnit,
     OBDSensor,
@@ -22,21 +25,14 @@ class OBDControllerError(Exception):
     pass
 
 
-class OBDController:
+class OBDController(BaseController):
     """
     Controller class for OBD-related data manipulations.
 
     Attributes:
         - PREFIXES (app.constants.obd.OBDSensorPrefixes): Set of prefixes used to extract data from TORQUE request.
-        - db_session (flask_sqlalchemy.SQLAlchemy.session): Database session instance.
     """
     PREFIXES = OBDSensorPrefixes
-
-    def __init__(self, db_session=None):
-        """ Class Constructor """
-        if db_session is None:
-            db_session = g.db_session
-        self.db_session = db_session
 
     def _resolve_user(self, data: dict):
         """

@@ -35,7 +35,7 @@
       @click:append="secret = !secret"
     />
     <v-text-field
-      v-model="model.confirmPassword"
+      v-model="model.confirm_password"
       :append-icon="secret ? 'mdi-eye-off' : 'mdi-eye'"
       :rules="[rules.required, rules.passwordLength, rules.passwordsMatch]"
       :type="secret ? 'password' : 'text'"
@@ -65,7 +65,7 @@ export default {
         last_name: '',
         email: '',
         password: '',
-        confirmPassword: '',
+        confirm_password: '',
       },
       secret: true,
       rules: {

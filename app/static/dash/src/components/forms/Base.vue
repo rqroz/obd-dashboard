@@ -2,6 +2,14 @@
   <v-form ref="form" v-model="valid" @keyup.native.enter="submit">
     <v-row>
       <v-col>
+        <v-row v-if="error" class="text-center">
+          <v-col class=" red--text">
+            {{ error.message }}
+            <div class="d-block" v-for="(message, idx) in errorMessages" :key="idx">
+              {{ message }}
+            </div>
+          </v-col>
+        </v-row>
         <slot></slot>
       </v-col>
     </v-row>
@@ -39,6 +47,19 @@ export default {
   data: () => ({
     valid: false,
   }),
+  computed: {
+    errorMessages() {
+      if (!this.error) { return []; }
+
+      const items = this.error.items;
+      return Object.keys(items).map(key => (
+          key === 'invalid' ?
+            items[key] :
+            `${this.$options.filters.titleCase(key)}: ${items[key]}`
+          )
+      );
+    },
+  },
   methods: {
     validate() {
       return this.$refs.form.validate();

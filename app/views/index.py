@@ -1,5 +1,5 @@
 """
-App initializer
+Index Views
 """
 import os
 import requests

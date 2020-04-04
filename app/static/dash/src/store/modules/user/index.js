@@ -24,8 +24,10 @@ export default {
     },
   },
   actions: {
-    [DEFINE_USER](context, playload) {
-      context.commit(SET_USER, playload.user);
+    [DEFINE_USER](context, payload) {
+      const user = payload.user;
+      user.created = new Date(user.created);
+      context.commit(SET_USER, user);
     },
     [CLEAR_USER](context) {
       context.commit(UNSET_USER);
