@@ -27,7 +27,8 @@
 
     <v-content>
       <v-container>
-        <router-view />
+        <base-loader v-if="busy" />
+        <router-view v-else />
       </v-container>
     </v-content>
 
@@ -39,6 +40,7 @@
 import NAVIGATION_ITEMS from '@/resources/navigation/drawer';
 
 import BaseFooter from '@/components/base/Footer';
+import BaseLoader from '@/components/base/Loader';
 import AuthLogout from '@/components/auth/Logout';
 
 
@@ -46,6 +48,7 @@ export default {
   components: {
     AuthLogout,
     BaseFooter,
+    BaseLoader,
   },
   data: () => ({
     mini: true,
@@ -54,6 +57,9 @@ export default {
   computed: {
     user() {
       return this.$store.getters.user;
+    },
+    busy() {
+      return this.$store.getters.loading;
     },
     navigationItems() {
       return this.user ? NAVIGATION_ITEMS.auth : NAVIGATION_ITEMS.unauth;

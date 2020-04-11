@@ -28,7 +28,6 @@ class UserController(BaseUserController):
     """
     Controller class for user related data manipulations.
     """
-
     def create_user(self, data):
         """
         Creates a new user record in the database.

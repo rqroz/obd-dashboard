@@ -6,6 +6,8 @@ import requests from './plugins/requests';
 import vuetify from './plugins/vuetify';
 import filters from './plugins/filters';
 
+import { ENABLE_LOADING_STATE, DISABLE_LOADING_STATE } from '@/store/modules/application/actions';
+import { DEFINE_USER } from '@/store/modules/user/actions';
 
 Vue.config.productionTip = false
 
@@ -52,6 +54,15 @@ new Vue({
         this.$router.push({ name: 'Index' });
       }
     },
+  },
+  created() {
+    store.dispatch(ENABLE_LOADING_STATE);
+    this.$requests.get('/profile/')
+      .then(response => {
+        store.dispatch(DEFINE_USER, response.data);
+        store.dispatch(DISABLE_LOADING_STATE);
+      })
+      .catch(() => store.dispatch(DISABLE_LOADING_STATE));
   },
   render: h => h(App)
 }).$mount('#app')

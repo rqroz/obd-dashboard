@@ -16,11 +16,9 @@ export default {
   mutations: {
     [SET_USER](state, user) {
       state.user = user;
-      localStorage.user = JSON.stringify(user);
     },
     [UNSET_USER](state) {
       state.user = null;
-      localStorage.removeItem('user');
     },
   },
   actions: {
