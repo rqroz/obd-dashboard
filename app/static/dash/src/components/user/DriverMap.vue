@@ -4,6 +4,9 @@
     :loading="loading"
   >
     <v-card>
+      <v-card-title>
+        Recent Trips
+      </v-card-title>
       <v-card-text class="d-flex justify-center">
         <here-map
           :width="mapWidth"
@@ -40,7 +43,7 @@ export default {
   },
   computed: {
     mapWidth() {
-      return `${3*this.$vuetify.breakpoint.width/4 - 200}px`;
+      return `${3*this.$vuetify.breakpoint.width/4 - 178}px`;
     },
     center() {
       const points = this.polyline.points;
