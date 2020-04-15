@@ -9,7 +9,6 @@
       </v-card-title>
       <v-card-text class="d-flex justify-center">
         <here-map
-          v-if="polylines.length"
           :width="mapWidth"
           :zoom="zoom"
           :center="center"
