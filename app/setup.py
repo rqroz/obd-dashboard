@@ -11,6 +11,7 @@ from app.database import setup_db, init_db
 from app.errors import setup_errors
 from app.logging import setup_logging
 from app.views import add_views
+from app.utils.encoders import DefaultJSONEncoder
 
 # Importing models so that DB is initialized
 from app.models import (
@@ -25,6 +26,7 @@ def create_app() -> Flask:
         static_folder=Defaults.FRONTEND_DIR,
         template_folder=Defaults.FRONTEND_DIR,
     )
+    server.json_encoder = DefaultJSONEncoder
     setup_logging()
     setup_errors(server)
     add_views(server)

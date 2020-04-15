@@ -25,10 +25,10 @@ def auth_required(func):
         except:
             return default_unauth_response()
 
-        user_id = g.db_session.query(User.id).filter(User.public_id == token_info['public_id']).scalar()
-        if not user_id:
+        user = g.db_session.query(User).filter(User.public_id == token_info['public_id']).first()
+        if not user:
             return default_unauth_response()
 
-        return func(user_id, *args, **kwargs)
+        return func(user, *args, **kwargs)
 
     return decorator

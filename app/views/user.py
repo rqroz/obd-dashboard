@@ -40,6 +40,7 @@ class UserViews:
         return response
 
     @auth_required
-    def profile_view(user_id):
-        controller = UserController(user_id=user_id)
+    def profile_view(user):
+        """ Retrieves basic user information """
+        controller = UserController(user_id=user.id)
         return jsonify({'user': controller.get_user().to_dict(include_protected=True, replace_id=True)})

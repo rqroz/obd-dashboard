@@ -6,7 +6,7 @@ import re
 from typing import List
 from structlog import get_logger
 
-from app.constants.obd import OBDSensorPrefixes
+from app.constants.obd import OBDSensorPrefixes, OBDSensorLabels
 from app.controllers import BaseController
 from app.models.obd import (
     OBDSensorUnit,
@@ -246,3 +246,66 @@ class OBDController(BaseController):
         else:
             # Register Values
             self._register_sensor_values(data)
+
+    def get_sensor_readings(self, user, label):
+        """
+        Returns a map of sensor readings, organized by session_id.
+        Will query based on the user and label informed.
+
+        TODO: Enhance query.
+
+        Args:
+            - user (app.models.user.User): User instance to retrieve id;
+            - label (str): Label of the desired sensor to get the readings from.
+
+        Returns:
+            - (dict): Map of session_id => values.
+        """
+        sensor_user =  (
+            self.db_session.query(OBDSensorUser)
+                            .filter(
+                                OBDSensorUser.user_id == user.id,
+                                OBDSensorUser.sensor.has(label=label),
+                            )
+                            .first()
+        )
+        sensor_values = (
+            self.db_session.query(OBDSensorValue)
+                            .filter(OBDSensorValue.sensor_user_id == sensor_user.id)
+                            .all()
+        )
+
+        readings = {}
+        for reading in sensor_values:
+            if reading.session_id not in readings:
+                readings[reading.session_id] = []
+            readings[reading.session_id].append(reading.value)
+
+        return readings
+
+
+    def get_gps_readings(self, user: User):
+        """
+        Returns a list of GPS readings organized by session.
+
+        Args:
+            - user (app.models.user.User): User instance to be used when retrieving the sensor readings.
+
+        Returns:
+            (List[dict]): List of GPS points organized by session.
+        """
+        lat_sensor_readings = self.get_sensor_readings(user, OBDSensorLabels.GPS_LATITUDE)
+        lng_sensor_readings = self.get_sensor_readings(user, OBDSensorLabels.GPS_LONGITUDE)
+
+        readings = []
+        for session_id, values in lat_sensor_readings.items():
+            readings.append({
+                'session_id': session_id,
+                'points': [
+                    {'lat': value, 'lng': lng_sensor_readings[session_id][idx]}
+                    for idx, value
+                    in enumerate(values)
+                ]
+            })
+
+        return readings
