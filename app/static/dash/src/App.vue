@@ -15,6 +15,7 @@
             <v-list-item-title>{{ item.label }}</v-list-item-title>
           </v-list-item-content>
         </v-list-item>
+        <upload-dialog />
       </v-list>
     </v-navigation-drawer>
 
@@ -42,6 +43,7 @@ import NAVIGATION_ITEMS from '@/resources/navigation/drawer';
 import BaseFooter from '@/components/base/Footer';
 import BaseLoader from '@/components/base/Loader';
 import AuthLogout from '@/components/auth/Logout';
+import UploadDialog from '@/components/upload/Dialog';
 
 
 export default {
@@ -49,6 +51,7 @@ export default {
     AuthLogout,
     BaseFooter,
     BaseLoader,
+    UploadDialog,
   },
   data: () => ({
     mini: true,
