@@ -26,6 +26,9 @@
             :rules="rules"
           />
         </v-form>
+        <div class="d-flex justify-end error--text" v-if="error">
+          {{ error }}
+        </div>
       </v-card-text>
       <v-card-actions>
         <v-spacer></v-spacer>
@@ -46,18 +49,20 @@ import FORM_RULES from '@/resources/forms/rules';
 
 export default {
   data: () => ({
+    error: null,
     dialog: false,
+    file: null,
+    loading: false,
     rules: [
       FORM_RULES.required,
       FORM_RULES.fileSize,
       value => !value || value.type === 'text/csv' || 'Please upload a CSV file.',
     ],
-    loading: false,
     valid: false,
-    file: null,
   }),
   methods: {
     submit() {
+      this.error = null;
       this.loading = true;
 
       const formData = new FormData();
@@ -66,12 +71,11 @@ export default {
       const config = { headers: { 'Content-Type': 'multipart/form-data' } };
 
       this.$requests.post('/obd/upload/', formData, config)
-        .then(response => {
-          console.log(response);
+        .then(() => {
+          this.dialog = false;
+          window.location.reload();
         })
-        .catch(error => {
-          console.log(error.response);
-        })
+        .catch(() => this.error = 'Unable to process file')
         .then(() => this.loading = false);
     },
   },

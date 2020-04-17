@@ -10,6 +10,17 @@ class OBDSensorPrefixes:
 
 
 class OBDSensorLabels:
-    GPS_LATITUDE = 'ff1006'
-    GPS_LONGITUDE = 'ff1005'
-    FUEL_RATIO = 'ff1203' #KM/L
+    class GPS:
+        LATITUDE = 'ff1006'
+        LONGITUDE = 'ff1005'
+
+    class Fuel:
+        RATIO = 'ff1203' #KM/L
+
+
+CSV_COLUM_SENSOR_MAP = {
+    ' Longitude': OBDSensorLabels.GPS.LONGITUDE,
+    ' Latitude': OBDSensorLabels.GPS.LATITUDE,
+}
+
+CSV_DEVICE_TIME_COL = ' Device Time'

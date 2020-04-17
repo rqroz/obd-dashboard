@@ -16,6 +16,12 @@ class OBDViews:
     def add_views(cls, server):
         server.add_url_rule('/obd', 'obd_view', view_func=cls.obd_view, methods=('GET',))
         server.add_url_rule(
+            '/api/obd/upload/',
+            'obd_csv_upload',
+            view_func=cls.obd_csv_upload,
+            methods=('POST',)
+        )
+        server.add_url_rule(
             '/api/locations/',
             'location_list_view',
             view_func=cls.location_list_view,
@@ -38,3 +44,25 @@ class OBDViews:
     def location_list_view(user):
         """ Retrieves GPS locations registered for the current user """
         return jsonify({'locations': OBDController().get_gps_readings(user)})
+
+    @auth_required
+    def obd_csv_upload(user):
+        """ Registers sensor information through a CSV file sent by the client """
+        try:
+            csv_file = request.files['file']
+        except KeyError:
+            response = jsonify({'message': 'Missing CSV file'})
+            response.status_code = 400
+            return response
+
+        controller = OBDController()
+        try:
+            controller.process_csv(user, csv_file)
+        except OBDControllerError as err:
+            message = str(err)
+            LOGGER.error('Unable to process CSV file', error=message)
+            response = jsonify({'message': message})
+            response.status_code = 400
+            return response
+
+        return jsonify({'message': 'Successfully processed the file'})

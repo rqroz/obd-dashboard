@@ -42,7 +42,7 @@ export default {
     center() {
       if (!this.polylines.length) { return this.defaultCenter; }
       const lastLine = this.polylines[this.polylines.length - 1];
-      return lastLine.points.length ? lastLine.points[lastLine.points - 1] : this.defaultCenter;
+      return lastLine.points.length ? lastLine.points[lastLine.points.length - 1] : this.defaultCenter;
     },
   },
   methods: {
