@@ -1,8 +1,7 @@
 FROM python:3.7-stretch
 
 EXPOSE 5000
-
-ENV ENVIRONMENT=local
+EXPOSE 5432
 
 RUN curl -sL https://deb.nodesource.com/setup_13.x | bash
 RUN apt-get install -y nodejs
