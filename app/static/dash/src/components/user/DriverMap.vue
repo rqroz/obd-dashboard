@@ -49,6 +49,9 @@ export default {
     successHandler(response) {
       this.polylines = response.data.locations;
     },
+    errorHandler(error) {
+      console.log(error);
+    },
   },
 };
 </script>

@@ -289,6 +289,9 @@ class OBDController(BaseController):
             - (dict): Map of session_id => values.
         """
         sensor_user =  self._get_sensor_user_by_label(user, label)
+        if not sensor_user:
+            return {}
+
         sensor_values = (
             self.db_session.query(OBDSensorValue)
                             .filter(OBDSensorValue.sensor_user_id == sensor_user.id)
