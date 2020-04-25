@@ -48,6 +48,8 @@ export default {
   }),
   methods: {
     addPolyLine(pline, color) {
+      if (pline.points.length < 2) { return; }
+
       const lineString = new window.H.geo.LineString();
       pline.points.forEach(point => lineString.pushPoint(point));
 
