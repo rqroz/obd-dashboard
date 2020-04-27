@@ -1,24 +1,21 @@
 <template>
-  <v-skeleton-loader
-    type="list-item-three-line"
-    :loading="loading"
-  >
-    <v-card elevation="3">
-      <v-card-title class="subtitle-1 font-weight-regular">
-        {{ average ? average.toFixed(2) : '-' }} %
-        <v-spacer />
-        <v-icon>mdi-engine</v-icon>
-      </v-card-title>
-      <v-card-subtitle>Average Engine Load</v-card-subtitle>
-    </v-card>
-  </v-skeleton-loader>
+  <simple-fetch-card
+    icon="mdi-engine"
+    subtitle="Average Engine Load"
+    :endpoint="endpoint"
+    :title="average ? `${average.toFixed(2)} %` : '-'"
+    @success="successHandler"
+    @error="errorHandler"
+  />
 </template>
 
 <script>
-import fetchMixin from '@/mixins/fetchMixin';
+import SimpleFetchCard from '@/components/utils/cards/SimpleFetch';
 
 export default {
-  mixins: [fetchMixin],
+  components: {
+    SimpleFetchCard,
+  },
   data: () => ({
     endpoint: '/engine/load/average/',
     average: null,
