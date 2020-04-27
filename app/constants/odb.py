@@ -18,10 +18,11 @@ class ODBSensorLabels:
 
     class Fuel:
         RATIO = 'ff1203' #KM/L
-        LEVEL = 'tmp-fuel-lvl'
+        LEVEL = '2f'
 
     class Engine:
-        LOAD = 'tmp-eng-ld'
+        LOAD = '43'
+        RPM = '0c'
 
 
 CSV_COLUM_SENSOR_MAP = {
