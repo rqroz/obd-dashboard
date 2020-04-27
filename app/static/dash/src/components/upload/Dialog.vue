@@ -82,6 +82,7 @@ export default {
   watch: {
     dialog(value) {
       if (value === false) {
+        this.error = null;
         this.$refs.form.reset();
       }
     },

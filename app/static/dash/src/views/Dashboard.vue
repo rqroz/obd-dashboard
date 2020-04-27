@@ -5,7 +5,7 @@
         <user-card />
       </v-col>
       <v-col>
-        <v-skeleton-loader type="list-item-three-line" :boilerplate="true" />
+        <engine-load-average-card />
       </v-col>
       <v-col>
         <v-skeleton-loader type="list-item-three-line" :boilerplate="true" />
@@ -26,12 +26,14 @@
 </template>
 
 <script>
+import EngineLoadAverageCard from '@/components/engine/load/AverageCard';
 import UserCard from '@/components/user/Card';
 import UserDriverMap from '@/components/user/DriverMap';
 
 export default {
   name: 'Home',
   components: {
+    EngineLoadAverageCard,
     UserCard,
     UserDriverMap,
   },

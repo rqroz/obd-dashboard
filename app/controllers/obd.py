@@ -9,6 +9,7 @@ from io import StringIO
 from typing import List
 from structlog import get_logger
 from sqlalchemy.orm import selectinload
+from sqlalchemy.sql import func
 
 from app.constants.obd import (
     OBDSensorPrefixes,
@@ -24,6 +25,7 @@ from app.models.obd import (
 )
 from app.models.odb import ODBSession
 from app.models.odb.gps import GPSReading
+from app.models.odb.engine import EngineLoad
 from app.models.user import User
 
 
@@ -335,24 +337,55 @@ class OBDController(BaseController):
 
         return readings
 
+    def get_engine_load_avg(self, user: User):
+        """
+        Returns the average engine load considering the complete history of a certain user.
+        """
+        return (
+            self.db_session.query(func.avg(EngineLoad.value))
+                            .filter(EngineLoad.session.has(user_id=user.id))
+        ).scalar()
+
+    def _resolve_date_from_csv_row(self, csv_row: dict):
+        """ Resolves a datetime from a certain row in a CSV """
+        date_str = csv_row[CSV_COLUM_SENSOR_MAP[OBDSensorLabels.DATE]]
+        return datetime.datetime.strptime(date_str[:-4], '%d-%b-%Y %H:%M:%S')
+
     def register_gps_from_csv(self, session: ODBSession, csv: pandas.DataFrame):
         """
         Will read gps data from a CSV and register the values for the current user.
         """
         values = csv[CSV_COLUM_SENSOR_MAP.values()]
         for idx, row in values.iterrows():
-            date_str = row[CSV_COLUM_SENSOR_MAP[OBDSensorLabels.DATE]]
             try:
                 reading = GPSReading(
                     session_id=session.id,
                     lat=row[CSV_COLUM_SENSOR_MAP[OBDSensorLabels.GPS.LATITUDE]],
                     lng=row[CSV_COLUM_SENSOR_MAP[OBDSensorLabels.GPS.LONGITUDE]],
-                    date=datetime.datetime.strptime(date_str[:-4], '%d-%b-%Y %H:%M:%S')
+                    date=self._resolve_date_from_csv_row(row)
                 )
             except:
                 continue
 
             self.db_session.add(reading)
+
+        self.db_session.flush()
+
+    def register_engine_load_from_csv(self, session: ODBSession, csv: pandas.DataFrame):
+        """
+        Will read and store data related to the engine load from CSV for the current user.
+        """
+        for idx, row in csv.iterrows():
+            try:
+                eng_load = EngineLoad(
+                    session_id=session.id,
+                    value=row[CSV_COLUM_SENSOR_MAP[OBDSensorLabels.Engine.LOAD]],
+                    date=self._resolve_date_from_csv_row(row),
+                )
+            except:
+                continue
+
+            self.db_session.add(eng_load)
 
         self.db_session.flush()
 
@@ -366,8 +399,13 @@ class OBDController(BaseController):
             - csv_file (werkzeug.FileStorage): A file representation of the CSV file created by TORQUE.
         """
         csv = pandas.read_csv(StringIO(csv_file.read().decode('utf-8')), usecols=CSV_COLUM_SENSOR_MAP.values())
-        session = ODBSession(id=str(datetime.datetime.now().timestamp()).replace('.', '')[:12], user_id=user.id)
-        self.db_session.add(session)
-        self.db_session.flush()
-        self.register_gps_from_csv(session, csv)
-        self.db_session.commit()
+        start_datetime = self._resolve_date_from_csv_row(csv.iloc[0])
+        gen_session_id = str(start_datetime.timestamp()).replace('.', '')[:12]
+
+        if not self.db_session.query(ODBSession).filter(ODBSession.id == gen_session_id).first():
+            session = ODBSession(id=gen_session_id, user_id=user.id)
+            self.db_session.add(session)
+            self.db_session.flush()
+            self.register_gps_from_csv(session, csv)
+            self.register_engine_load_from_csv(session, csv)
+            self.db_session.commit()

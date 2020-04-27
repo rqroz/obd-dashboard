@@ -27,6 +27,12 @@ class OBDViews:
             view_func=cls.location_list_view,
             methods=('GET',),
         )
+        server.add_url_rule(
+            '/api/engine/load/average/',
+            'engine_load_avg_view',
+            view_func=cls.engine_load_avg_view,
+            methods=('GET',),
+        )
 
     def obd_view():
         """
@@ -44,6 +50,11 @@ class OBDViews:
     def location_list_view(user):
         """ Retrieves GPS locations registered for the current user """
         return jsonify({'trips': OBDController().get_gps_readings(user)})
+
+    @auth_required
+    def engine_load_avg_view(user):
+        """ Retrieves GPS locations registered for the current user """
+        return jsonify({'average': OBDController().get_engine_load_avg(user)})
 
     @auth_required
     def obd_csv_upload(user):

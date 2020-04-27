@@ -21,3 +21,4 @@ class ODBSession(DATABASE.Model, DictDataModel):
 
     user = relationship(User, uselist=False)
     gps_readings = relationship('GPSReading', uselist=True)
+    engine_load_readings = relationship('EngineLoad', uselist=True)

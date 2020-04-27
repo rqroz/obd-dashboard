@@ -20,6 +20,7 @@ from app.models import (
     user,
 )
 from app.models.odb import (
+    engine,
     gps,
 )
 
