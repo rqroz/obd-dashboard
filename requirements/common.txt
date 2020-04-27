@@ -11,3 +11,4 @@ bcrypt==3.1.7
 marshmallow==3.5.1
 PyJWT==1.7.1
 pandas==1.0.3
+dash==1.11.0

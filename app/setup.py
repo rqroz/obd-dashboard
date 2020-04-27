@@ -11,6 +11,7 @@ from app.constants import Defaults
 from app.database import setup_db, init_db
 from app.errors import setup_errors
 from app.logging import setup_logging
+from app.plotly_dash.dashboard import init_plotly_dash
 from app.views import add_views
 from app.utils.encoders import DefaultJSONEncoder
 
@@ -61,5 +62,7 @@ def create_app() -> Flask:
         )
 
         return response
+
+    init_plotly_dash(server)
 
     return server

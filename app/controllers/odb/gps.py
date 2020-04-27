@@ -60,6 +60,7 @@ class GPSController(BaseODBController):
         db_data = (
             self.db_session.query(ODBSession)
                             .filter(ODBSession.user_id == User.id)
+                            .order_by(ODBSession.date.asc())
                             .options(selectinload('gps_readings'))
         )
 
