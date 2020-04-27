@@ -8,7 +8,7 @@ from sqlalchemy.orm import relationship
 
 from app.database import DATABASE
 from app.models import DictDataModel
-from app.models.odb import ODBSession
+from app.models.odb.session import ODBSession
 from app.models.user import User
 
 

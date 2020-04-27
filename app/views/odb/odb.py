@@ -1,17 +1,17 @@
 """
-OBD Views.
+ODB Views.
 """
 from structlog import get_logger
 from flask import request, jsonify
 
-from app.controllers.obd import OBDController, OBDControllerError
+from app.controllers.odb.odb import ODBController, ODBControllerError
 from app.decorators import auth_required
 
 
 LOGGER = get_logger(__name__)
 
 
-class OBDViews:
+class ODBViews:
     @classmethod
     def add_views(cls, server):
         server.add_url_rule('/obd', 'obd_view', view_func=cls.obd_view, methods=('GET',))
@@ -21,40 +21,18 @@ class OBDViews:
             view_func=cls.obd_csv_upload,
             methods=('POST',)
         )
-        server.add_url_rule(
-            '/api/locations/',
-            'location_list_view',
-            view_func=cls.location_list_view,
-            methods=('GET',),
-        )
-        server.add_url_rule(
-            '/api/engine/load/average/',
-            'engine_load_avg_view',
-            view_func=cls.engine_load_avg_view,
-            methods=('GET',),
-        )
 
     def obd_view():
         """
         Receives TORQUE request and process the data accordingly.
         """
-        controller = OBDController()
+        controller = ODBController()
         try:
             controller.process_sensor_params(request.args)
-        except OBDControllerError as err:
+        except ODBControllerError as err:
             LOGGER.error(str(err))
 
         return 'OK!'
-
-    @auth_required
-    def location_list_view(user):
-        """ Retrieves GPS locations registered for the current user """
-        return jsonify({'trips': OBDController().get_gps_readings(user)})
-
-    @auth_required
-    def engine_load_avg_view(user):
-        """ Retrieves GPS locations registered for the current user """
-        return jsonify({'average': OBDController().get_engine_load_avg(user)})
 
     @auth_required
     def obd_csv_upload(user):
@@ -66,10 +44,10 @@ class OBDViews:
             response.status_code = 400
             return response
 
-        controller = OBDController()
+        controller = ODBController()
         try:
             controller.process_csv(user, csv_file)
-        except OBDControllerError as err:
+        except ODBControllerError as err:
             message = str(err)
             LOGGER.error('Unable to process CSV file', error=message)
             response = jsonify({'message': message})

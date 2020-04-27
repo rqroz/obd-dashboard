@@ -1,57 +1,50 @@
 """
-OBD Controller
+ODB Controller
 """
-import datetime
 import pandas
 import re
 
 from io import StringIO
 from typing import List
 from structlog import get_logger
-from sqlalchemy.orm import selectinload
-from sqlalchemy.sql import func
 
-from app.constants.obd import (
-    OBDSensorPrefixes,
-    OBDSensorLabels,
-    CSV_COLUM_SENSOR_MAP,
-)
-from app.controllers import BaseController
+from app.constants.odb import ODBSensorPrefixes, CSV_COLUM_SENSOR_MAP
+from app.controllers.odb import BaseODBController
+from app.controllers.odb.engine import EngineController
+from app.controllers.odb.gps import GPSController
 from app.models.obd import (
     OBDSensorUnit,
     OBDSensor,
     OBDSensorUser,
     OBDSensorValue,
 )
-from app.models.odb import ODBSession
-from app.models.odb.gps import GPSReading
-from app.models.odb.engine import EngineLoad
+from app.models.odb.session import ODBSession
 from app.models.user import User
 
 
 LOGGER = get_logger(__name__)
 
 
-class OBDControllerError(Exception):
-    """ Exception class for OBD Controller """
+class ODBControllerError(Exception):
+    """ Exception class for ODB Controller """
     pass
 
 
-class OBDController(BaseController):
+class ODBController(BaseODBController):
     """
-    Controller class for OBD-related data manipulations.
+    Controller class for ODB-related data manipulations.
 
     Attributes:
-        - PREFIXES (app.constants.obd.OBDSensorPrefixes): Set of prefixes used to extract data from TORQUE request.
+        - PREFIXES (app.constants.odb.ODBSensorPrefixes): Set of prefixes used to extract data from TORQUE request.
     """
-    PREFIXES = OBDSensorPrefixes
+    PREFIXES = ODBSensorPrefixes
 
     def _resolve_user(self, data: dict):
         """
         Resolves user from data.
 
         Raises:
-            - OBDControllerError:
+            - ODBControllerError:
                 If user email is not found in <data>;
                 If there is no user corresponding to the email found in <data>;
 
@@ -63,17 +56,17 @@ class OBDController(BaseController):
         """
         user_email = data.get('eml')
         if not user_email:
-            raise OBDControllerError('User email not found')
+            raise ODBControllerError('User email not found')
 
         user: User = self.db_session.query(User).filter(User.email == user_email).first()
         if not user:
-            raise OBDControllerError('User does not exist')
+            raise ODBControllerError('User does not exist')
 
         return user
 
     def _get_unit(self, label: str):
         """
-        OBDSensorUnit: Get method.
+        ODBSensorUnit: Get method.
         Will fetch the first item matching label.
 
         Args:
@@ -229,7 +222,7 @@ class OBDController(BaseController):
         user = self._resolve_user(data)
         session_id = data.get('session')
         if not session_id:
-            raise OBDControllerError('Session is not specified')
+            raise ODBControllerError('Session is not specified')
 
         sensor_keys = list(filter(re.compile(f'{self.PREFIXES.SENSOR}.*').match, data.keys()))
         for sensor_key in sensor_keys:
@@ -311,84 +304,6 @@ class OBDController(BaseController):
 
         return readings
 
-    def get_gps_readings(self, user: User):
-        """
-        Returns a list of GPS readings organized by session.
-
-        Args:
-            - user (app.models.user.User): User instance to be used when retrieving the sensor readings.
-
-        Returns:
-            (List[dict]): List of GPS points organized by session.
-        """
-        db_data = (
-            self.db_session.query(ODBSession)
-                            .filter(ODBSession.user_id == User.id)
-                            .options(selectinload('gps_readings'))
-        )
-
-        readings = []
-        for row in db_data:
-            readings.append({
-                'session_id': row.id,
-                'date': row.date,
-                'points': [gps.get_point() for gps in row.gps_readings]
-            })
-
-        return readings
-
-    def get_engine_load_avg(self, user: User):
-        """
-        Returns the average engine load considering the complete history of a certain user.
-        """
-        return (
-            self.db_session.query(func.avg(EngineLoad.value))
-                            .filter(EngineLoad.session.has(user_id=user.id))
-        ).scalar()
-
-    def _resolve_date_from_csv_row(self, csv_row: dict):
-        """ Resolves a datetime from a certain row in a CSV """
-        date_str = csv_row[CSV_COLUM_SENSOR_MAP[OBDSensorLabels.DATE]]
-        return datetime.datetime.strptime(date_str[:-4], '%d-%b-%Y %H:%M:%S')
-
-    def register_gps_from_csv(self, session: ODBSession, csv: pandas.DataFrame):
-        """
-        Will read gps data from a CSV and register the values for the current user.
-        """
-        values = csv[CSV_COLUM_SENSOR_MAP.values()]
-        for idx, row in values.iterrows():
-            try:
-                reading = GPSReading(
-                    session_id=session.id,
-                    lat=row[CSV_COLUM_SENSOR_MAP[OBDSensorLabels.GPS.LATITUDE]],
-                    lng=row[CSV_COLUM_SENSOR_MAP[OBDSensorLabels.GPS.LONGITUDE]],
-                    date=self._resolve_date_from_csv_row(row)
-                )
-            except:
-                continue
-
-            self.db_session.add(reading)
-
-        self.db_session.flush()
-
-    def register_engine_load_from_csv(self, session: ODBSession, csv: pandas.DataFrame):
-        """
-        Will read and store data related to the engine load from CSV for the current user.
-        """
-        for idx, row in csv.iterrows():
-            try:
-                eng_load = EngineLoad(
-                    session_id=session.id,
-                    value=row[CSV_COLUM_SENSOR_MAP[OBDSensorLabels.Engine.LOAD]],
-                    date=self._resolve_date_from_csv_row(row),
-                )
-            except:
-                continue
-
-            self.db_session.add(eng_load)
-
-        self.db_session.flush()
-
     def process_csv(self, user: User, csv_file):
         """
         Will process a CSV file generated by the TORQUE application, registering the values for each
@@ -402,10 +317,17 @@ class OBDController(BaseController):
         start_datetime = self._resolve_date_from_csv_row(csv.iloc[0])
         gen_session_id = str(start_datetime.timestamp()).replace('.', '')[:12]
 
-        if not self.db_session.query(ODBSession).filter(ODBSession.id == gen_session_id).first():
-            session = ODBSession(id=gen_session_id, user_id=user.id)
-            self.db_session.add(session)
-            self.db_session.flush()
-            self.register_gps_from_csv(session, csv)
-            self.register_engine_load_from_csv(session, csv)
-            self.db_session.commit()
+        if self.db_session.query(ODBSession).filter(ODBSession.id == gen_session_id).first():
+            return
+
+        session = ODBSession(id=gen_session_id, user_id=user.id)
+        self.db_session.add(session)
+        self.db_session.flush()
+
+        gps_controller = GPSController(db_session=self.db_session)
+        gps_controller.register_gps_from_csv(session, csv, flush=True)
+
+        engine_controller = EngineController(db_session=self.db_session)
+        engine_controller.register_engine_load_from_csv(session, csv, flush=True)
+
+        self.db_session.commit()

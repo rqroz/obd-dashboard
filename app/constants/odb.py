@@ -1,15 +1,15 @@
 """
-OBD Specific constants.
+ODB Specific constants.
 """
 
-class OBDSensorPrefixes:
+class ODBSensorPrefixes:
     FULL_NAME = 'userFullName'
     SHORT_NAME = 'userShortName'
     UNIT = 'userUnit'
     SENSOR = 'k'
 
 
-class OBDSensorLabels:
+class ODBSensorLabels:
     DATE = 'tmp'
 
     class GPS:
@@ -24,8 +24,8 @@ class OBDSensorLabels:
 
 
 CSV_COLUM_SENSOR_MAP = {
-    OBDSensorLabels.DATE: ' Device Time',
-    OBDSensorLabels.GPS.LONGITUDE: ' Longitude',
-    OBDSensorLabels.GPS.LATITUDE: ' Latitude',
-    OBDSensorLabels.Engine.LOAD: 'Engine Load(Absolute)(%)',
+    ODBSensorLabels.DATE: ' Device Time',
+    ODBSensorLabels.GPS.LONGITUDE: ' Longitude',
+    ODBSensorLabels.GPS.LATITUDE: ' Latitude',
+    ODBSensorLabels.Engine.LOAD: 'Engine Load(Absolute)(%)',
 }

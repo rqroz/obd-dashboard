@@ -46,7 +46,7 @@ export default {
     HereMap,
   },
   data: () => ({
-    endpoint: '/locations/',
+    endpoint: '/gps/locations/',
     trips: [],
     selected: null,
     zoom: 13,

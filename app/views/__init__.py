@@ -7,8 +7,12 @@ from app.views import (
     auth,
     index,
     health,
-    obd,
     user,
+)
+from app.views.odb import (
+    engine,
+    gps,
+    odb,
 )
 
 
@@ -17,5 +21,9 @@ def add_views(app: Flask):
     auth.AuthViews.add_views(app)
     health.HealthViews.add_views(app)
     index.IndexViews.add_views(app)
-    obd.OBDViews.add_views(app)
     user.UserViews.add_views(app)
+
+    # ODB
+    engine.EngineViews.add_views(app)
+    gps.GPSViews.add_views(app)
+    odb.ODBViews.add_views(app)
