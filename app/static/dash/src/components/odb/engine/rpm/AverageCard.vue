@@ -1,9 +1,9 @@
 <template>
   <simple-fetch-card
-    icon="mdi-engine"
-    subtitle="Average Engine Load"
+    icon="mdi-speedometer"
+    subtitle="Average RPM"
     :endpoint="endpoint"
-    :title="average ? `${average.toFixed(2)} %` : '-'"
+    :title="average ? average.toFixed(0) : '-'"
     @success="successHandler"
     @error="errorHandler"
   />
@@ -13,11 +13,12 @@
 import SimpleFetchCard from '@/components/utils/cards/SimpleFetch';
 
 export default {
+  name: 'EngineRpmAverageCard',
   components: {
     SimpleFetchCard,
   },
   data: () => ({
-    endpoint: '/engine/load/average/',
+    endpoint: '/engine/rpm/average/',
     average: null,
   }),
   methods: {

@@ -30,5 +30,6 @@ CSV_COLUM_SENSOR_MAP = {
     ODBSensorLabels.GPS.LONGITUDE: ' Longitude',
     ODBSensorLabels.GPS.LATITUDE: ' Latitude',
     ODBSensorLabels.Engine.LOAD: 'Engine Load(Absolute)(%)',
+    ODBSensorLabels.Engine.RPM: 'Engine RPM(rpm)',
     ODBSensorLabels.Fuel.LEVEL: 'Fuel Level (From Engine ECU)(%)',
 }

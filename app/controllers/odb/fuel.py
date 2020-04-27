@@ -1,13 +1,13 @@
 """
 ODB Controller
 """
-import pandas
+from pandas import DataFrame
 
 from app.constants.odb import (
     ODBSensorLabels,
     CSV_COLUM_SENSOR_MAP,
 )
-from app.controllers.odb import BaseODBController
+from app.controllers.odb import BaseODBSensorController
 from app.models.odb.session import ODBSession
 from app.models.odb.fuel import FuelLevel
 from app.models.user import User
@@ -18,30 +18,16 @@ class FuelControllerError(Exception):
     pass
 
 
-class FuelController(BaseODBController):
+class FuelController(BaseODBSensorController):
     """
     Controller class for Engine-related data manipulations.
     """
-    def register_fuel_level_from_csv(self, session: ODBSession, csv: pandas.DataFrame, flush: bool = False):
+    def register_fuel_level_from_csv(self, session: ODBSession, csv: DataFrame, flush: bool = False):
         """
         Will read and store data related to the fuel level from CSV for the current user.
         """
-        for idx, row in csv.iterrows():
-            try:
-                fuel_level = FuelLevel(
-                    session_id=session.id,
-                    value=row[CSV_COLUM_SENSOR_MAP[ODBSensorLabels.Fuel.LEVEL]],
-                    date=self._resolve_date_from_csv_row(row),
-                )
-            except:
-                continue
-
-            self.db_session.add(fuel_level)
-
-        if flush:
-            self.db_session.flush()
-        else:
-            self.db_session.commit()
+        value_key = CSV_COLUM_SENSOR_MAP[ODBSensorLabels.Fuel.LEVEL]
+        self._register_values_csv(FuelLevel, value_key, session, csv, flush)
 
     def get_latest_fuel_level(self, user: User):
         """ Get's the last fuel level value for the current user """

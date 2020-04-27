@@ -8,10 +8,10 @@
         <fuel-level-card />
       </v-col>
       <v-col>
-        <v-skeleton-loader type="list-item-three-line" :boilerplate="true" />
+        <engine-rpm-average-card />
       </v-col>
       <v-col>
-        <engine-average-load-card />
+        <engine-load-average-card />
       </v-col>
     </v-row>
     <v-row>
@@ -23,7 +23,8 @@
 </template>
 
 <script>
-import EngineAverageLoadCard from '@/components/odb/engine/AverageLoadCard';
+import EngineLoadAverageCard from '@/components/odb/engine/load/AverageCard';
+import EngineRpmAverageCard from '@/components/odb/engine/rpm/AverageCard';
 import FuelLevelCard from '@/components/odb/fuel/FuelLevelCard';
 import UserCard from '@/components/user/Card';
 import UserDriverMap from '@/components/user/DriverMap';
@@ -31,7 +32,8 @@ import UserDriverMap from '@/components/user/DriverMap';
 export default {
   name: 'Home',
   components: {
-    EngineAverageLoadCard,
+    EngineLoadAverageCard,
+    EngineRpmAverageCard,
     FuelLevelCard,
     UserCard,
     UserDriverMap,

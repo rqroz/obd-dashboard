@@ -321,7 +321,7 @@ class ODBController(BaseODBController):
         if self.db_session.query(ODBSession).filter(ODBSession.id == gen_session_id).first():
             return
 
-        session = ODBSession(id=gen_session_id, user_id=user.id)
+        session = ODBSession(id=gen_session_id, user_id=user.id, date=start_datetime)
         self.db_session.add(session)
         self.db_session.flush()
 
@@ -330,6 +330,7 @@ class ODBController(BaseODBController):
 
         engine_controller = EngineController(db_session=self.db_session)
         engine_controller.register_engine_load_from_csv(session, csv, flush=True)
+        engine_controller.register_engine_rpm_from_csv(session, csv, flush=True)
 
         fuel_controller = FuelController(db_session=self.db_session)
         fuel_controller.register_fuel_level_from_csv(session, csv, flush=True)

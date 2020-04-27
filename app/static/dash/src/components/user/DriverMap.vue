@@ -49,7 +49,7 @@ export default {
     endpoint: '/gps/locations/',
     trips: [],
     selected: null,
-    zoom: 13,
+    zoom: 11,
     defaultCenter: { 'lat': -5.7793, 'lng': -35.2009 },
   }),
   computed: {
@@ -62,7 +62,7 @@ export default {
     center() {
       if (!this.selected) { return this.defaultCenter; }
       return this.selected.points.length ?
-        this.selected.points[this.selected.points.length - 1] :
+        this.selected.points[Math.floor(this.selected.points.length/2)] :
         this.defaultCenter;
     },
     polylines() {

@@ -1,4 +1,10 @@
-const formattedDate = date => date.toLocaleDateString('en-US').split('/').map(val => val.padStart(2, '0')).join('/');
+const formattedDate = date => (
+  date.toLocaleDateString('pt-BR')
+      .split('/')
+      .map(val => val.padStart(2, '0'))
+      .join('/')
+);
+
 const formattedTime = date => {
   var hours = date.getHours();
   const minutes = date.getMinutes();
