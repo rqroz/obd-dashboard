@@ -2,6 +2,7 @@
 Configure things here
 """
 import json
+import locale
 
 import structlog
 from flask import Flask
@@ -18,9 +19,13 @@ from app.models import (
     obd,
     user,
 )
+from app.models.odb import (
+    gps,
+)
 
 
 def create_app() -> Flask:
+    locale.setlocale(locale.LC_ALL, 'pt_BR.UTF-8')
     server = Flask(
         __name__,
         static_folder=Defaults.FRONTEND_DIR,

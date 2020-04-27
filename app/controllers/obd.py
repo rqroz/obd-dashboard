@@ -8,6 +8,7 @@ import re
 from io import StringIO
 from typing import List
 from structlog import get_logger
+from sqlalchemy.orm import selectinload
 
 from app.constants.obd import (
     OBDSensorPrefixes,
@@ -21,6 +22,8 @@ from app.models.obd import (
     OBDSensorUser,
     OBDSensorValue,
 )
+from app.models.odb import ODBSession
+from app.models.odb.gps import GPSReading
 from app.models.user import User
 
 
@@ -316,21 +319,42 @@ class OBDController(BaseController):
         Returns:
             (List[dict]): List of GPS points organized by session.
         """
-        lat_sensor_readings = self.get_sensor_readings(user, OBDSensorLabels.GPS.LATITUDE)
-        lng_sensor_readings = self.get_sensor_readings(user, OBDSensorLabels.GPS.LONGITUDE)
+        db_data = (
+            self.db_session.query(ODBSession)
+                            .filter(ODBSession.user_id == User.id)
+                            .options(selectinload('gps_readings'))
+        )
 
         readings = []
-        for session_id, values in lat_sensor_readings.items():
+        for row in db_data:
             readings.append({
-                'session_id': session_id,
-                'points': [
-                    {'lat': value, 'lng': lng_sensor_readings[session_id][idx]}
-                    for idx, value
-                    in enumerate(values)
-                ]
+                'session_id': row.id,
+                'date': row.date,
+                'points': [gps.get_point() for gps in row.gps_readings]
             })
 
         return readings
+
+    def register_gps_from_csv(self, session: ODBSession, csv: pandas.DataFrame):
+        """
+        Will read gps data from a CSV and register the values for the current user.
+        """
+        values = csv[CSV_COLUM_SENSOR_MAP.values()]
+        for idx, row in values.iterrows():
+            date_str = row[CSV_COLUM_SENSOR_MAP[OBDSensorLabels.DATE]]
+            try:
+                reading = GPSReading(
+                    session_id=session.id,
+                    lat=row[CSV_COLUM_SENSOR_MAP[OBDSensorLabels.GPS.LATITUDE]],
+                    lng=row[CSV_COLUM_SENSOR_MAP[OBDSensorLabels.GPS.LONGITUDE]],
+                    date=datetime.datetime.strptime(date_str[:-4], '%d-%b-%Y %H:%M:%S')
+                )
+            except:
+                continue
+
+            self.db_session.add(reading)
+
+        self.db_session.flush()
 
     def process_csv(self, user: User, csv_file):
         """
@@ -341,25 +365,9 @@ class OBDController(BaseController):
             - user (app.models.user.User): User instance;
             - csv_file (werkzeug.FileStorage): A file representation of the CSV file created by TORQUE.
         """
-        csv = pandas.read_csv(StringIO(csv_file.read().decode('utf-8')), usecols=CSV_COLUM_SENSOR_MAP.keys())
-        session_id = str(datetime.datetime.now().timestamp()).replace('.', '')[:12]
-        for column, sensor_label in CSV_COLUM_SENSOR_MAP.items():
-            sensor_user = self._get_sensor_user_by_label(user, sensor_label)
-            if not sensor_user:
-                continue
-
-            for row_value in csv[column].values:
-                try:
-                    value = float(row_value)
-                except:
-                    continue
-
-                self.db_session.add(
-                    OBDSensorValue(
-                        sensor_user_id=sensor_user.id,
-                        session_id=session_id,
-                        value=value,
-                    )
-                )
-
+        csv = pandas.read_csv(StringIO(csv_file.read().decode('utf-8')), usecols=CSV_COLUM_SENSOR_MAP.values())
+        session = ODBSession(id=str(datetime.datetime.now().timestamp()).replace('.', '')[:12], user_id=user.id)
+        self.db_session.add(session)
+        self.db_session.flush()
+        self.register_gps_from_csv(session, csv)
         self.db_session.commit()

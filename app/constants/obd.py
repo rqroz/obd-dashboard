@@ -10,6 +10,8 @@ class OBDSensorPrefixes:
 
 
 class OBDSensorLabels:
+    DATE = 'tmp'
+
     class GPS:
         LATITUDE = 'ff1006'
         LONGITUDE = 'ff1005'
@@ -19,8 +21,7 @@ class OBDSensorLabels:
 
 
 CSV_COLUM_SENSOR_MAP = {
-    ' Longitude': OBDSensorLabels.GPS.LONGITUDE,
-    ' Latitude': OBDSensorLabels.GPS.LATITUDE,
+    OBDSensorLabels.DATE: ' Device Time',
+    OBDSensorLabels.GPS.LONGITUDE: ' Longitude',
+    OBDSensorLabels.GPS.LATITUDE: ' Latitude',
 }
-
-CSV_DEVICE_TIME_COL = ' Device Time'

@@ -43,7 +43,7 @@ class OBDViews:
     @auth_required
     def location_list_view(user):
         """ Retrieves GPS locations registered for the current user """
-        return jsonify({'locations': OBDController().get_gps_readings(user)})
+        return jsonify({'trips': OBDController().get_gps_readings(user)})
 
     @auth_required
     def obd_csv_upload(user):
