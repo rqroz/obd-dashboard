@@ -3,7 +3,6 @@ ODB Controller
 """
 import pandas
 
-from typing import List
 from sqlalchemy.sql import func
 
 from app.constants.odb import (

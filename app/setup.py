@@ -21,7 +21,9 @@ from app.models import (
 )
 from app.models.odb import (
     engine,
+    fuel,
     gps,
+    session,
 )
 
 

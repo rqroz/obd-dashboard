@@ -11,6 +11,7 @@ from app.views import (
 )
 from app.views.odb import (
     engine,
+    fuel,
     gps,
     odb,
 )
@@ -25,5 +26,6 @@ def add_views(app: Flask):
 
     # ODB
     engine.EngineViews.add_views(app)
+    fuel.FuelViews.add_views(app)
     gps.GPSViews.add_views(app)
     odb.ODBViews.add_views(app)

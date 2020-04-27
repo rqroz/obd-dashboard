@@ -1,5 +1,5 @@
 """
-Engine-related OBD Readings.
+Fuel-related OBD Readings.
 """
 import datetime
 
@@ -12,9 +12,9 @@ from app.models.odb.session import ODBSession
 from app.models.user import User
 
 
-class EngineLoad(DATABASE.Model, DictDataModel):
-    """ Readings for Engine Load data from ODB sensors. """
-    __tablename__ = "odb_engine_load"
+class FuelLevel(DATABASE.Model, DictDataModel):
+    """ Readings for Fuel Level data from ODB sensors. """
+    __tablename__ = "odb_fuel_level"
 
     id = Column(Integer, primary_key=True)
     session_id = Column(Integer, ForeignKey(ODBSession.id))

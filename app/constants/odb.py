@@ -18,6 +18,7 @@ class ODBSensorLabels:
 
     class Fuel:
         RATIO = 'ff1203' #KM/L
+        LEVEL = 'tmp-fuel-lvl'
 
     class Engine:
         LOAD = 'tmp-eng-ld'
@@ -28,4 +29,5 @@ CSV_COLUM_SENSOR_MAP = {
     ODBSensorLabels.GPS.LONGITUDE: ' Longitude',
     ODBSensorLabels.GPS.LATITUDE: ' Latitude',
     ODBSensorLabels.Engine.LOAD: 'Engine Load(Absolute)(%)',
+    ODBSensorLabels.Fuel.LEVEL: 'Fuel Level (From Engine ECU)(%)',
 }

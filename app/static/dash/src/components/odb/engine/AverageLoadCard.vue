@@ -5,7 +5,7 @@
   >
     <v-card elevation="3">
       <v-card-title class="subtitle-1 font-weight-regular">
-        {{ this.average.toFixed(2) }} %
+        {{ average ? average.toFixed(2) : '-' }} %
         <v-spacer />
         <v-icon>mdi-engine</v-icon>
       </v-card-title>
@@ -25,7 +25,6 @@ export default {
   }),
   methods: {
     successHandler(response) {
-      console.log(response);
       this.average = response.data.average;
     },
     errorHandler(error) {

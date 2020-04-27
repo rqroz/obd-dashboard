@@ -11,6 +11,7 @@ from structlog import get_logger
 from app.constants.odb import ODBSensorPrefixes, CSV_COLUM_SENSOR_MAP
 from app.controllers.odb import BaseODBController
 from app.controllers.odb.engine import EngineController
+from app.controllers.odb.fuel import FuelController
 from app.controllers.odb.gps import GPSController
 from app.models.obd import (
     OBDSensorUnit,
@@ -329,5 +330,8 @@ class ODBController(BaseODBController):
 
         engine_controller = EngineController(db_session=self.db_session)
         engine_controller.register_engine_load_from_csv(session, csv, flush=True)
+
+        fuel_controller = FuelController(db_session=self.db_session)
+        fuel_controller.register_fuel_level_from_csv(session, csv, flush=True)
 
         self.db_session.commit()
