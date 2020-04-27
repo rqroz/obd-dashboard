@@ -57,7 +57,7 @@ export default {
       return this.trips.map(trip => ({ text: this.$options.filters.datetime(new Date(trip.date)), value: trip }));
     },
     mapWidth() {
-      return `${3*this.$vuetify.breakpoint.width/4 - 178}px`;
+      return `${this.$vuetify.breakpoint.width - 178}px`;
     },
     center() {
       if (!this.selected) { return this.defaultCenter; }
