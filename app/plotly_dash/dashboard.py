@@ -8,16 +8,12 @@ import dash_core_components as dcc
 from flask import Flask
 
 
-EXTERNAL_STYLESHEETS = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
-
-
 def init_plotly_dash(app: Flask):
     """ Create a Plotly Dash dashboard. """
     with app.app_context():
         dash_app = dash.Dash(
             server=app,
             routes_pathname_prefix='/dash/',
-            external_stylesheets=EXTERNAL_STYLESHEETS,
         )
 
         create_layout(dash_app)
@@ -27,12 +23,6 @@ def init_plotly_dash(app: Flask):
 
 def create_layout(dash_app):
     dash_app.layout = html.Div(children=[
-        html.H1(children='Hello Dash'),
-
-        html.Div(children='''
-            Dash: A web application framework for Python.
-        '''),
-
         dcc.Graph(
             id='example-graph',
             figure={

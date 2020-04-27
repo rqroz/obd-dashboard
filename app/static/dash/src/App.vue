@@ -15,7 +15,7 @@
             <v-list-item-title>{{ item.label }}</v-list-item-title>
           </v-list-item-content>
         </v-list-item>
-        <upload-dialog />
+        <upload-dialog v-if="$store.getters.user"/>
       </v-list>
     </v-navigation-drawer>
 

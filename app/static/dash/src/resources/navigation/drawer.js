@@ -5,6 +5,11 @@ export default {
       label: 'Control Panel',
       route: { name: 'Dashboard' },
     },
+    {
+      icon: 'mdi-gas-station',
+      label: 'Fuel Analysis',
+      route: { name: 'Fuel' },
+    },
   ],
   unauth: [
     {
