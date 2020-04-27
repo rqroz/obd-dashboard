@@ -51,4 +51,7 @@ class FuelController(BaseODBController):
                             .order_by(FuelLevel.date.desc())
                             .first()
         )
-        return level.value
+
+        if level:
+            return level.value
+        return None
