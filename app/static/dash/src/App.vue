@@ -63,7 +63,7 @@ export default {
   },
   data: vm => ({
     mini: !vm.$vuetify.breakpoint.mdAndDown,
-    drawer: false,
+    drawer: true,
     title: 'OBD II - Dashboard',
   }),
   computed: {
@@ -84,6 +84,7 @@ export default {
     small(value) {
       if (value) {
         this.mini = false;
+        this.drawer = true;
       } else {
         this.mini = true;
         this.drawer = true;
