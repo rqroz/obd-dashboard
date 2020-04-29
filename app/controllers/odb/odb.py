@@ -329,8 +329,9 @@ class ODBController(BaseODBController):
         gps_controller.register_gps_from_csv(session, csv, flush=True)
 
         engine_controller = EngineController(db_session=self.db_session)
-        engine_controller.register_engine_load_from_csv(session, csv, flush=True)
-        engine_controller.register_engine_rpm_from_csv(session, csv, flush=True)
+        engine_controller.register_load_from_csv(session, csv, flush=True)
+        engine_controller.register_rpm_from_csv(session, csv, flush=True)
+        engine_controller.register_speed_from_csv(session, csv, flush=True)
 
         fuel_controller = FuelController(db_session=self.db_session)
         fuel_controller.register_fuel_level_from_csv(session, csv, flush=True)

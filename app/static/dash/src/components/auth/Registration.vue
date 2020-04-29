@@ -73,7 +73,7 @@ export default {
         passwordLength: FORM_RULES.passwordLength,
         required: FORM_RULES.required,
         passwordsMatch: value => value === this.model.password || 'The passwords don\'t match',
-        nameLength: value => value.length >= 5 || 'This field must have at least 5 characters',
+        nameLength: value => value.length >= 3 || 'This field must have at least 3 characters',
       },
     };
   },

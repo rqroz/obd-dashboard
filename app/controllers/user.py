@@ -12,7 +12,7 @@ from typing import List
 
 from app.controllers import BaseUserController
 from app.models.user import User
-from app.validators.user import UserCreateSchema
+from app.validators.user import BasicUserSchema, UserCreateSchema
 from app.utils.exceptions import DictException
 
 
@@ -59,6 +59,34 @@ class UserController(BaseUserController):
             raise UserControllerException({'forbidden': 'User with that email already exists'})
 
         self.user_id = user.id
+        return user
+
+    def update_user(self, data):
+        """
+        Updates basic user information.
+
+        Raises:
+            - UserControllerException: if <data> is invalid.
+
+        Args:
+            - data (dict): Data to be validated and further assigned to the user.
+
+        Returns:
+            - user (app.models.user.User): Updated user object.
+        """
+        user = self.get_user()
+
+        validator = BasicUserSchema()
+        try:
+            loaded_data = validator.load(data)
+        except ValidationError as error:
+            raise UserControllerException(error.messages)
+
+        for key, value in loaded_data.items():
+            setattr(user, key, value)
+
+        self.db_session.commit()
+
         return user
 
     def get_user(self, **kwargs):

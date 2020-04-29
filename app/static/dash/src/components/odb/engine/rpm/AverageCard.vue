@@ -1,6 +1,6 @@
 <template>
   <simple-fetch-card
-    icon="mdi-speedometer"
+    icon="mdi-gauge"
     subtitle="Average RPM"
     :endpoint="endpoint"
     :title="average ? average.toFixed(0) : '-'"

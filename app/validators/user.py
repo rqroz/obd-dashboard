@@ -6,10 +6,8 @@ from marshmallow.fields import Bool, Email, Str
 from marshmallow.validate import Length
 
 
-class UserCreateSchema(Schema):
+class BasicUserSchema(Schema):
     email = Email(required=True)
-    password = Str(required=True, validate=Length(min=8))
-    confirm_password = Str(required=True, validate=Length(min=8))
     first_name = Str(required=True, validate=Length(max=100))
     last_name = Str(required=True, validate=Length(max=100))
 
@@ -19,6 +17,11 @@ class UserCreateSchema(Schema):
         data['first_name'] = data.pop('first_name').strip()
         data['last_name'] = data.pop('last_name').strip()
         return data
+
+
+class UserCreateSchema(BasicUserSchema):
+    password = Str(required=True, validate=Length(min=8))
+    confirm_password = Str(required=True, validate=Length(min=8))
 
     @validates_schema
     def validates_password_confirmation(self, data, **kwargs):

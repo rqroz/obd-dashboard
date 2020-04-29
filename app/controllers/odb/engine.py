@@ -10,7 +10,7 @@ from app.constants.odb import (
 )
 from app.controllers.odb import BaseODBSensorController
 from app.models.odb.session import ODBSession
-from app.models.odb.engine import EngineLoad, EngineRPM
+from app.models.odb.engine import EngineLoad, EngineRPM, Speed
 from app.models.user import User
 
 
@@ -33,28 +33,35 @@ class EngineController(BaseODBSensorController):
                             .filter(engine_class.session.has(user_id=user.id))
         ).scalar()
 
-    def get_engine_load_avg(self, user: User):
+    def get_load_avg(self, user: User):
         """
         Returns the average engine load considering the complete history of a certain user.
         """
         return self._get_average(EngineLoad, user)
 
-    def get_engine_rpm_avg(self, user: User):
+    def get_rpm_avg(self, user: User):
         """
         Returns the average engine RPM considering the complete history of a certain user.
         """
         return self._get_average(EngineRPM, user)
 
-    def register_engine_load_from_csv(self, session: ODBSession, csv: DataFrame, flush: bool = False):
+    def register_load_from_csv(self, session: ODBSession, csv: DataFrame, flush: bool = False):
         """
         Will read and store data related to the engine load from CSV for the current user.
         """
         value_key = CSV_COLUM_SENSOR_MAP[ODBSensorLabels.Engine.LOAD]
         self._register_values_csv(EngineLoad, value_key, session, csv, flush)
 
-    def register_engine_rpm_from_csv(self, session: ODBSession, csv: DataFrame, flush: bool = False):
+    def register_rpm_from_csv(self, session: ODBSession, csv: DataFrame, flush: bool = False):
         """
         Will read and store data related to the engine load from CSV for the current user.
         """
         value_key = CSV_COLUM_SENSOR_MAP[ODBSensorLabels.Engine.RPM]
         self._register_values_csv(EngineRPM, value_key, session, csv, flush)
+
+    def register_speed_from_csv(self, session: ODBSession, csv: DataFrame, flush: bool = False):
+        """
+        Will read and store data related to car speed from CSV for the current user.
+        """
+        value_key = CSV_COLUM_SENSOR_MAP[ODBSensorLabels.Engine.SPEED]
+        self._register_values_csv(Speed, value_key, session, csv, flush)

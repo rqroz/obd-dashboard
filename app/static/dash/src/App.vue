@@ -1,6 +1,11 @@
 <template>
   <v-app>
-    <v-navigation-drawer app clipped :mini-variant="mini">
+    <v-navigation-drawer
+      app
+      clipped
+      :mini-variant="mini"
+      v-model="drawer"
+    >
       <v-list dense>
         <v-list-item
           link
@@ -16,11 +21,12 @@
           </v-list-item-content>
         </v-list-item>
         <upload-dialog v-if="$store.getters.user"/>
+        <user-edit-dialog v-if="$store.getters.user"/>
       </v-list>
     </v-navigation-drawer>
 
     <v-app-bar app clipped-left>
-      <v-app-bar-nav-icon @click.stop="mini = !mini" />
+      <v-app-bar-nav-icon @click.stop="handleDrawerToggle" />
       <v-toolbar-title>{{ title }}</v-toolbar-title>
       <v-spacer/>
       <auth-logout v-if="user" />
@@ -44,6 +50,7 @@ import BaseFooter from '@/components/base/Footer';
 import BaseLoader from '@/components/base/Loader';
 import AuthLogout from '@/components/auth/Logout';
 import UploadDialog from '@/components/upload/Dialog';
+import UserEditDialog from '@/components/user/EditDialog';
 
 
 export default {
@@ -52,9 +59,11 @@ export default {
     BaseFooter,
     BaseLoader,
     UploadDialog,
+    UserEditDialog,
   },
-  data: () => ({
-    mini: true,
+  data: vm => ({
+    mini: !vm.$vuetify.breakpoint.mdAndDown,
+    drawer: false,
     title: 'OBD II - Dashboard',
   }),
   computed: {
@@ -66,6 +75,28 @@ export default {
     },
     navigationItems() {
       return this.user ? NAVIGATION_ITEMS.auth : NAVIGATION_ITEMS.unauth;
+    },
+    small() {
+      return this.$vuetify.breakpoint.mdAndDown;
+    },
+  },
+  watch: {
+    small(value) {
+      if (value) {
+        this.mini = false;
+      } else {
+        this.mini = true;
+        this.drawer = true;
+      }
+    }
+  },
+  methods: {
+    handleDrawerToggle() {
+      if (this.small) {
+        this.drawer = !this.drawer;
+      } else {
+        this.mini = !this.mini;
+      }
     },
   },
 }

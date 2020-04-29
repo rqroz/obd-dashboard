@@ -6,6 +6,16 @@ export default {
       route: { name: 'Dashboard' },
     },
     {
+      icon: 'mdi-steering',
+      label: 'Driver Profiling',
+      route: { name: 'Driver' },
+    },
+    {
+      icon: 'mdi-engine',
+      label: 'Engine Analysis',
+      route: { name: 'Engine' },
+    },
+    {
       icon: 'mdi-gas-station',
       label: 'Fuel Analysis',
       route: { name: 'Fuel' },

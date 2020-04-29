@@ -13,3 +13,8 @@ class EngineLoad(DATABASE.Model, ODBSensorValueMixin):
 class EngineRPM(DATABASE.Model, ODBSensorValueMixin):
     """ Readings for Engine RPM data from ODB sensors. """
     __tablename__ = 'odb_engine_rpm'
+
+
+class Speed(DATABASE.Model, ODBSensorValueMixin):
+    """ Readings for Engine RPM data from ODB sensors. """
+    __tablename__ = 'odb_speed'

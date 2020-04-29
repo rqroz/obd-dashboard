@@ -23,6 +23,7 @@ class ODBSensorLabels:
     class Engine:
         LOAD = '43'
         RPM = '0c'
+        SPEED = '0d'
 
 
 CSV_COLUM_SENSOR_MAP = {
@@ -31,5 +32,6 @@ CSV_COLUM_SENSOR_MAP = {
     ODBSensorLabels.GPS.LATITUDE: ' Latitude',
     ODBSensorLabels.Engine.LOAD: 'Engine Load(Absolute)(%)',
     ODBSensorLabels.Engine.RPM: 'Engine RPM(rpm)',
+    ODBSensorLabels.Engine.SPEED: 'Speed (OBD)(km/h)',
     ODBSensorLabels.Fuel.LEVEL: 'Fuel Level (From Engine ECU)(%)',
 }
