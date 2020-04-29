@@ -2,9 +2,8 @@ import Vue from 'vue'
 import VueRouter from 'vue-router'
 import Home from '@/views/Home.vue'
 import Dashboard from '@/views/Dashboard.vue'
-import Driver from '@/views/Driver.vue'
-import Engine from '@/views/Engine.vue'
-import Fuel from '@/views/Fuel.vue'
+import DriverProfile from '@/views/DriverProfile.vue'
+import LineChart from '@/views/LineChart.vue'
 
 
 Vue.use(VueRouter)
@@ -24,21 +23,15 @@ const routes = [
     meta: { requiresAuth: true },
   },
   {
-    path: '/driver',
-    name: 'Driver',
-    component: Driver,
+    path: '/driver-profile',
+    name: 'DriverProfile',
+    component: DriverProfile,
     meta: { requiresAuth: true },
   },
   {
-    path: '/engine',
-    name: 'Engine',
-    component: Engine,
-    meta: { requiresAuth: true },
-  },
-  {
-    path: '/fuel',
-    name: 'Fuel',
-    component: Fuel,
+    path: '/line-chart',
+    name: 'LineChart',
+    component: LineChart,
     meta: { requiresAuth: true },
   },
 ]

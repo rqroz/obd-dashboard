@@ -8,17 +8,12 @@ export default {
     {
       icon: 'mdi-steering',
       label: 'Driver Profiling',
-      route: { name: 'Driver' },
+      route: { name: 'DriverProfile' },
     },
     {
-      icon: 'mdi-engine',
-      label: 'Engine Analysis',
-      route: { name: 'Engine' },
-    },
-    {
-      icon: 'mdi-gas-station',
-      label: 'Fuel Analysis',
-      route: { name: 'Fuel' },
+      icon: 'mdi-chart-bell-curve',
+      label: 'Line Charts',
+      route: { name: 'LineChart' },
     },
   ],
   unauth: [

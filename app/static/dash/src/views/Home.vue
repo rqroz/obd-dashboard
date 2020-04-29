@@ -37,7 +37,7 @@
 import AuthCard from '@/components/auth/Card'
 
 export default {
-  name: 'Home',
+  name: 'HomeView',
   components: {
     AuthCard,
   },
