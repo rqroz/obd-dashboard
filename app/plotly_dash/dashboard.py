@@ -31,7 +31,7 @@ def app_setup(dash_app):
     dash_app.config.suppress_callback_exceptions = True
     dash_app.layout = html.Div([
         dcc.Location(id='url', refresh=False),
-        html.Div(id='page-content', style={'color': Colors.TEXT})
+        html.Div(id='page-content')
     ])
 
     lines_graph_layout = get_lines_page_layout(dash_app)
