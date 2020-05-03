@@ -36,7 +36,7 @@ def gen_line_graph_figure(items: List[dict]):
     ]
     layout = dict(
         xaxis={'title': 'Index'},
-        yaxis={'title': 'Speed (km/h)'},
+        yaxis={'title': 'Value'},
         legend={'x': 0, 'y': 1},
         hovermode='closest',
         plot_bgcolor=Colors.BACKGROUND,

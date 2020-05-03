@@ -31,7 +31,7 @@ def gen_radar_graph_figure(session_ids: List[int]):
                 max(df['fuel_level'].values),
                 max(df['speed'].values),
             ],
-            theta=['engine_load', 'engine_rpm', 'fuel_level', 'speed'],
+            theta=['Engine Load (%)', 'Engine RPM', 'Fuel Level (%)', 'Speed (Km/h)'],
             name=session['date'].strftime('%d/%m/%Y %H:%M'),
             line_color=colors[idx%len(colors)],
         ))

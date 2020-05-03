@@ -30,7 +30,10 @@ class SessionController(BaseUserController):
     def get(self, id: int, fields: List[str] = None):
         return (
             self.db_session.query(*self._resolve_query(fields))
-                            .filter(ODBSession.id == id)
+                            .filter(
+                                ODBSession.id == id,
+                                ODBSession.user_id == self.user_id,
+                            )
                             .first()
         )
 

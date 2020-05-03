@@ -7,10 +7,10 @@ class Colors:
 
 
 CHART_TYPES = [
-    {'label': 'Engine Load', 'value': 'engine_load_readings'},
-    {'label': 'Fuel', 'value': 'fuel_level_readings'},
+    {'label': 'Engine Load (%)', 'value': 'engine_load_readings'},
+    {'label': 'Fuel (%)', 'value': 'fuel_level_readings'},
     {'label': 'RPM', 'value': 'engine_rpm_readings'},
-    {'label': 'Speed', 'value': 'speed_readings'},
+    {'label': 'Speed (Km/h)', 'value': 'speed_readings'},
 ]
 
 
