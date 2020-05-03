@@ -45,3 +45,9 @@ class BaseODBSensorController(BaseODBController):
             self.db_session.flush()
         else:
             self.db_session.commit()
+
+    def _register_value(self, db_model, session, value, date):
+        ins = db_model(session_id=session.id, value=value, date=date)
+        self.db_session.add(ins)
+        self.db_session.commit()
+        return ins

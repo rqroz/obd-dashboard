@@ -65,3 +65,9 @@ class EngineController(BaseODBSensorController):
         """
         value_key = CSV_COLUM_SENSOR_MAP[ODBSensorLabels.Engine.SPEED]
         self._register_values_csv(Speed, value_key, session, csv, flush)
+
+    def register_load(self, session: ODBSession, value, date):
+        return self._register_value(EngineLoad, session, value, date)
+
+    def register_rpm(self, session: ODBSession, value, date):
+        return self._register_value(EngineRPM, session, value, date)

@@ -41,3 +41,6 @@ class FuelController(BaseODBSensorController):
         if level:
             return level.value
         return None
+
+    def register_fuel_level(self, session: ODBSession, value, date):
+        return self._register_value(FuelLevel, session, value, date)

@@ -10,20 +10,20 @@ class ODBSensorPrefixes:
 
 
 class ODBSensorLabels:
-    DATE = 'tmp'
+    DATE = 'time'
 
     class GPS:
-        LATITUDE = 'ff1006'
-        LONGITUDE = 'ff1005'
+        LATITUDE = 'kff1006'
+        LONGITUDE = 'kff1005'
 
     class Fuel:
-        RATIO = 'ff1203' #KM/L
-        LEVEL = '2f'
+        RATIO = 'kff1203' #KM/L
+        LEVEL = 'k2f'
 
     class Engine:
-        LOAD = '43'
-        RPM = '0c'
-        SPEED = '0d'
+        LOAD = 'k43'
+        RPM = 'k0c'
+        SPEED = 'k0d'
 
 
 CSV_COLUM_SENSOR_MAP = {

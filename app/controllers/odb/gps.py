@@ -73,3 +73,14 @@ class GPSController(BaseODBController):
             })
 
         return readings
+
+    def register_gps_reading(self, session: ODBSession, lat, lng, date):
+        gps_reading = GPSReading(
+            session_id=session.id,
+            lat=lat,
+            lng=lng,
+            date=date
+        )
+        self.db_session.add(gps_reading)
+        self.db_session.commit()
+        return gps_reading

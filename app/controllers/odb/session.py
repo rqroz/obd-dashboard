@@ -77,3 +77,12 @@ class SessionController(BaseUserController):
             data.append(sesh)
 
         return data
+
+    def get_or_create(self, id):
+        session = self.get(id)
+        if not session:
+            session = ODBSession(user_id=self.user_id, id=id)
+            self.db_session.add(session)
+            self.db_session.commit()
+
+        return session
