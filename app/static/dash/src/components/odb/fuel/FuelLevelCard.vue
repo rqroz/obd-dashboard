@@ -22,7 +22,7 @@ export default {
   }),
   methods: {
     successHandler(response) {
-      this.level = Number(response.data.level);
+      this.level = parseFloat(response.data.level);
     },
     errorHandler(error) {
       console.log(error);

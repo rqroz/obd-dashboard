@@ -23,7 +23,7 @@ export default {
   }),
   methods: {
     successHandler(response) {
-      this.average = response.data.average;
+      this.average = parseFloat(response.data.average);
     },
     errorHandler(error) {
       console.log(error);
