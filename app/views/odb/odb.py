@@ -14,15 +14,15 @@ LOGGER = get_logger(__name__)
 class ODBViews:
     @classmethod
     def add_views(cls, server):
-        server.add_url_rule('/obd', 'obd_view', view_func=cls.obd_view, methods=('GET',))
+        server.add_url_rule('/odb', 'odb_torque_view', view_func=cls.odb_torque_view, methods=('GET',))
         server.add_url_rule(
-            '/api/obd/upload/',
-            'obd_csv_upload',
-            view_func=cls.obd_csv_upload,
+            '/api/odb/upload/',
+            'odb_csv_upload',
+            view_func=cls.odb_csv_upload,
             methods=('POST',)
         )
 
-    def obd_view():
+    def odb_torque_view():
         """
         Receives TORQUE request and process the data accordingly.
         """
@@ -35,7 +35,7 @@ class ODBViews:
         return 'OK!'
 
     @auth_required
-    def obd_csv_upload(user):
+    def odb_csv_upload(user):
         """ Registers sensor information through a CSV file sent by the client """
         try:
             csv_file = request.files['file']

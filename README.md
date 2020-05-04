@@ -1,2 +1,2 @@
-# obd-dashboard
-Dashboard application for OBD II data
+# odb-dashboard
+Dashboard application for ODB II data

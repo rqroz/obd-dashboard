@@ -20,8 +20,8 @@ class ODBSession(DATABASE.Model, DictDataModel):
     date = Column(DateTime, default=datetime.datetime.utcnow)
 
     user = relationship(User, uselist=False)
-    gps_readings = relationship('GPSReading', uselist=True)
     engine_load_readings = relationship('EngineLoad', uselist=True)
     engine_rpm_readings = relationship('EngineRPM', uselist=True)
     fuel_level_readings = relationship('FuelLevel', uselist=True)
+    gps_readings = relationship('GPSReading', uselist=True)
     speed_readings = relationship('Speed', uselist=True)

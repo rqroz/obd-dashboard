@@ -15,12 +15,6 @@ from app.controllers.odb.engine import EngineController
 from app.controllers.odb.fuel import FuelController
 from app.controllers.odb.gps import GPSController
 from app.controllers.odb.session import SessionController
-from app.models.obd import (
-    OBDSensorUnit,
-    OBDSensor,
-    OBDSensorUser,
-    OBDSensorValue,
-)
 from app.models.odb.session import ODBSession
 from app.models.user import User
 

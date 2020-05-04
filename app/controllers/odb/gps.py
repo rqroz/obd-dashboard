@@ -54,7 +54,7 @@ class GPSController(BaseODBController):
         Returns:
             (List[dict]): List of GPS points organized by session.
         """
-        db_data = (
+        sessions = (
             self.db_session.query(ODBSession)
                             .filter(ODBSession.user_id == user.id)
                             .order_by(ODBSession.date.asc())
@@ -62,11 +62,11 @@ class GPSController(BaseODBController):
         )
 
         readings = []
-        for row in db_data:
+        for session in sessions:
             readings.append({
-                'session_id': row.id,
-                'date': row.date,
-                'points': [gps.get_point() for gps in row.gps_readings]
+                'session_id': session.id,
+                'date': session.date,
+                'points': [gps.get_point() for gps in session.gps_readings]
             })
 
         return readings

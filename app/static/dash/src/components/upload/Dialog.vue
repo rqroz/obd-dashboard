@@ -70,7 +70,7 @@ export default {
 
       const config = { headers: { 'Content-Type': 'multipart/form-data' } };
 
-      this.$requests.post('/obd/upload/', formData, config)
+      this.$requests.post('/odb/upload/', formData, config)
         .then(() => {
           this.dialog = false;
           window.location.reload();
