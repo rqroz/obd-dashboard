@@ -3,6 +3,7 @@ Base ODB controllers.
 """
 import datetime
 
+from decimal import Decimal
 from pandas import DataFrame
 
 from app.controllers import BaseController
@@ -46,7 +47,19 @@ class BaseODBSensorController(BaseODBController):
         else:
             self.db_session.commit()
 
-    def _register_value(self, db_model, session, value, date):
+    def _register_value(self, db_model: any, session: ODBSession, value: Decimal, date: datetime.datetime):
+        """
+        Stores a new value within <db_model>'s table.
+
+        Args:
+            - db_model (any): Target database model.
+            - session (app.models.odb.session.ODBSession): Session to be attached to value.
+            - value (decimal.Decimal): Value to be stored.
+            - date (datetime.datetime): Date corresponding to the capture of that value.
+
+        Returns:
+            - ins (any): Instace of <db_model> saved on the database.
+        """
         ins = db_model(session_id=session.id, value=value, date=date)
         self.db_session.add(ins)
         self.db_session.commit()

@@ -76,36 +76,48 @@ class ODBController(BaseODBController):
         Args:
             - data (dict): Data to be processed.
         """
+        LOGGER.info('Receiving sensor data from TORQUE', **data)
         has_full_name_keys = any(filter(re.compile(f'{self.PREFIXES.FULL_NAME}.*').match, data.keys()))
         if has_full_name_keys:
+            LOGGER.info('Will ignore request since it\'s related to sensor params')
             return
 
         user = self._resolve_user(data)
+        LOGGER.info(f'Request is attached to {user.first_name} {user.last_name}', user_id=user.id)
         session = SessionController(user_id=user.id).get_or_create(data['session'])
+        LOGGER.info('Resolved session to proceed', **session.to_dict())
         now = datetime.datetime.now()
         data_keys = list(data.keys())
 
         # GPS Reading
         if ODBSensorLabels.GPS.LATITUDE in data_keys and ODBSensorLabels.GPS.LONGITUDE in data_keys:
+            LOGGER.info('Will save GPS reading')
             gps_controller = GPSController(db_session=self.db_session)
-            gps_controller.register_gps_reading(
+            gps_reading = gps_controller.register_gps_reading(
                 session=session,
                 lat=data[ODBSensorLabels.GPS.LATITUDE],
                 lng=data[ODBSensorLabels.GPS.LONGITUDE],
                 date=now,
             )
+            LOGGER.info('Saved GPS Reading', **gps_reading.to_dict())
 
         # Fuel Level
         if ODBSensorLabels.Fuel.LEVEL in data_keys:
+            LOGGER.info('Will save Fuel Level')
             fuel_controller = FuelController(db_session=self.db_session)
-            fuel_controller.register_fuel_level(session, data[ODBSensorLabels.Fuel.LEVEL], now)
+            fuel_level = fuel_controller.register_fuel_level(session, data[ODBSensorLabels.Fuel.LEVEL], now)
+            LOGGER.info('Saved Fuel Level', **fuel_level.to_dict())
 
         # Engine sensors
         engine_controller = EngineController(db_session=self.db_session)
         if ODBSensorLabels.Engine.LOAD in data_keys:
-            engine_controller.register_load(session, data[ODBSensorLabels.Engine.LOAD], now)
+            LOGGER.info('Will save Engine Load value')
+            load = engine_controller.register_load(session, data[ODBSensorLabels.Engine.LOAD], now)
+            LOGGER.info('Saved Engine Load', **load.to_dict())
         if ODBSensorLabels.Engine.RPM in data_keys:
-            engine_controller.register_rpm(session, data[ODBSensorLabels.Engine.RPM], now)
+            LOGGER.info('Will save Engine RPM value')
+            rpm = engine_controller.register_rpm(session, data[ODBSensorLabels.Engine.RPM], now)
+            LOGGER.info('Saved Engine RPM', **rpm.to_dict())
 
     def process_csv(self, user: User, csv_file):
         """

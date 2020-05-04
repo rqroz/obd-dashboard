@@ -1,8 +1,10 @@
 """
 ODB Controller
 """
+import datetime
 import pandas
 
+from decimal import Decimal
 from sqlalchemy.orm import selectinload
 
 from app.constants.odb import (
@@ -13,11 +15,6 @@ from app.controllers.odb import BaseODBController
 from app.models.odb.session import ODBSession
 from app.models.odb.gps import GPSReading
 from app.models.user import User
-
-
-class GPSControllerError(Exception):
-    """ Exception class for GPSController Controller """
-    pass
 
 
 class GPSController(BaseODBController):
@@ -74,7 +71,19 @@ class GPSController(BaseODBController):
 
         return readings
 
-    def register_gps_reading(self, session: ODBSession, lat, lng, date):
+    def register_gps_reading(self, session: ODBSession, lat: Decimal, lng: Decimal, date: datetime.datetime):
+        """
+        Will save a GPSReading record on the database.
+
+        Args:
+            - session (app.models.odb.session.ODBSession): Session to be attached to new record.
+            - lat (Decimal): Lattiude value.
+            - lng (Decimal): Longitude value.
+            - date (datetime.datetime): Date of reading.
+
+        Returns:
+            - gps_reading (app.models.odb.gps.GPSReading): An instance of the saved record on the database.
+        """
         gps_reading = GPSReading(
             session_id=session.id,
             lat=lat,

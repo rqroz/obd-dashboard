@@ -1,6 +1,9 @@
 """
 ODB Controller
 """
+import datetime
+
+from decimal import Decimal
 from pandas import DataFrame
 
 from app.constants.odb import (
@@ -11,11 +14,6 @@ from app.controllers.odb import BaseODBSensorController
 from app.models.odb.session import ODBSession
 from app.models.odb.fuel import FuelLevel
 from app.models.user import User
-
-
-class FuelControllerError(Exception):
-    """ Exception class for FuelController """
-    pass
 
 
 class FuelController(BaseODBSensorController):
@@ -42,5 +40,8 @@ class FuelController(BaseODBSensorController):
             return level.value
         return None
 
-    def register_fuel_level(self, session: ODBSession, value, date):
+    def register_fuel_level(self, session: ODBSession, value: Decimal, date: datetime.datetime):
+        """
+        Will save a FuelLevel record on the database.
+        """
         return self._register_value(FuelLevel, session, value, date)

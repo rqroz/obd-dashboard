@@ -1,6 +1,9 @@
 """
 ODB Controller
 """
+import datetime
+
+from decimal import Decimal
 from pandas import DataFrame
 from sqlalchemy.sql import func
 
@@ -12,11 +15,6 @@ from app.controllers.odb import BaseODBSensorController
 from app.models.odb.session import ODBSession
 from app.models.odb.engine import EngineLoad, EngineRPM, Speed
 from app.models.user import User
-
-
-class EngineControllerError(Exception):
-    """ Exception class for EngineController """
-    pass
 
 
 class EngineController(BaseODBSensorController):
@@ -66,8 +64,14 @@ class EngineController(BaseODBSensorController):
         value_key = CSV_COLUM_SENSOR_MAP[ODBSensorLabels.Engine.SPEED]
         self._register_values_csv(Speed, value_key, session, csv, flush)
 
-    def register_load(self, session: ODBSession, value, date):
+    def register_load(self, session: ODBSession, value: Decimal, date: datetime.datetime):
+        """
+        Will save an EngineLoad record on the database.
+        """
         return self._register_value(EngineLoad, session, value, date)
 
-    def register_rpm(self, session: ODBSession, value, date):
+    def register_rpm(self, session: ODBSession, value: Decimal, date: datetime.datetime):
+        """
+        Will save an EngineRPM record on the database.
+        """
         return self._register_value(EngineRPM, session, value, date)
