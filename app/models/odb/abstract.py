@@ -20,7 +20,7 @@ class ODBSensorMixin(DictDataModel):
 
     @declared_attr
     def session_id(cls):
-        return Column(Integer, ForeignKey(ODBSession.id))
+        return Column(String, ForeignKey(ODBSession.id))
 
     @declared_attr
     def session(cls):

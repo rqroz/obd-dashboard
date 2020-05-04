@@ -7,6 +7,10 @@ RUN curl -sL https://deb.nodesource.com/setup_13.x | bash
 RUN apt-get install -y nodejs
 
 RUN apt-get -y update
+RUN apt-get install -y locales locales-all
+ENV LC_ALL pt_BR.UTF-8
+ENV LANG pt_BR.UTF-8
+ENV LANGUAGE pt_BR.UTF-8
 
 COPY . /code
 
