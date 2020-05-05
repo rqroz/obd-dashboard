@@ -2,26 +2,23 @@
   <v-container justify="center">
     <v-row class="text-center ">
       <v-col cols="12">
-        <v-img
-          :src="require('../assets/logo.svg')"
-          class="my-3"
-          contain
-          height="200"
-        />
+        <div class="ma-5 pt-5">
+          <v-icon size="150">mdi-car-connected</v-icon>
+        </div>
       </v-col>
 
       <v-col class="mb-4">
         <h1 class="display-1 font-weight-bold mb-3">
-          Welcome to OBD II Dashboard
+          Welcome to your OBD II Dashboard
         </h1>
 
         <p class="subheading font-weight-regular">
-          For help and collaboration with other Vuetify developers,
-          <br>please join our online
+          For help and collaboration to the project,
+          <br>please open a pull request to
           <a
-            href="https://community.vuetifyjs.com"
+            href="https://github.com/rqroz/obd-dashboard"
             target="_blank"
-          >Discord Community</a>
+          >our repository</a>.
         </p>
       </v-col>
     </v-row>
