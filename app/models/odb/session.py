@@ -23,5 +23,6 @@ class ODBSession(DATABASE.Model, DictDataModel):
     engine_load_readings = relationship('EngineLoad', uselist=True)
     engine_rpm_readings = relationship('EngineRPM', uselist=True)
     fuel_level_readings = relationship('FuelLevel', uselist=True)
+    fuel_ratio_readings = relationship('FuelRatio', uselist=True)
     gps_readings = relationship('GPSReading', uselist=True)
     speed_readings = relationship('Speed', uselist=True)

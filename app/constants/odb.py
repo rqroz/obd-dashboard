@@ -17,13 +17,13 @@ class ODBSensorLabels:
         LONGITUDE = 'kff1005'
 
     class Fuel:
-        RATIO = 'kff1203' #KM/L
+        RATIO = 'kff1203'
         LEVEL = 'k2f'
 
     class Engine:
         LOAD = 'k43'
-        RPM = 'k0c'
-        SPEED = 'k0d'
+        RPM = 'kc'
+        SPEED = 'kd'
 
 
 CSV_COLUM_SENSOR_MAP = {
@@ -34,4 +34,5 @@ CSV_COLUM_SENSOR_MAP = {
     ODBSensorLabels.Engine.RPM: 'Engine RPM(rpm)',
     ODBSensorLabels.Engine.SPEED: 'Speed (OBD)(km/h)',
     ODBSensorLabels.Fuel.LEVEL: 'Fuel Level (From Engine ECU)(%)',
+    ODBSensorLabels.Fuel.RATIO: 'Kilometers Per Litre(Instant)(kpl)',
 }

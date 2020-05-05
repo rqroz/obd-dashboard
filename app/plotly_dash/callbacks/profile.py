@@ -1,14 +1,32 @@
 """
 Module for driving profile graph callbacks.
 """
-import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
 
+from decimal import Decimal
 from typing import List
 from dash.dependencies import Input, Output
 
 from app.plotly_dash.utils import get_session_controller
+
+
+def get_polar_value(sequence: List[Decimal]):
+    """
+    Will process <sequence> to get the resulting value for the profile graph.
+
+    Args:
+        - sequence (List[Decimal]): List of sensor values.
+
+    Returns:
+        - (float): Normalized average.
+    """
+    sequence_length = len(sequence)
+    if not sequence_length:
+        return 0
+
+    max_val = max(sequence)
+    return sum([val/max_val for val in sequence])/sequence_length
 
 
 def gen_radar_graph_figure(session_ids: List[int]):
@@ -23,18 +41,26 @@ def gen_radar_graph_figure(session_ids: List[int]):
     fig = go.Figure()
     colors = px.colors.sequential.tempo
     for idx, session in enumerate(sessions):
-        df = pd.DataFrame(session)
-        fig.add_trace(go.Scatterpolar(
-            r=[
-                max(df['engine_load'].values),
-                max(df['engine_rpm'].values/100),
-                max(df['fuel_level'].values),
-                max(df['speed'].values),
-            ],
-            theta=['Engine Load (%)', 'Engine RPM', 'Fuel Level (%)', 'Speed (Km/h)'],
-            name=session['date'].strftime('%d/%m/%Y %H:%M'),
-            line_color=colors[idx%len(colors)],
-        ))
+        fig.add_trace(
+            go.Scatterpolar(
+                r=[
+                    get_polar_value(session['engine_load']),
+                    get_polar_value([rpm/100 for rpm in session['engine_rpm']]),
+                    get_polar_value(session['fuel_level']),
+                    get_polar_value(session['fuel_ratio']),
+                    get_polar_value(session['speed']),
+                ],
+                theta=[
+                    'Engine Load',
+                    'Engine RPM',
+                    'Fuel Level',
+                    'Fuel Ratio',
+                    'Speed',
+                ],
+                name=session['date'].strftime('%d/%m/%Y %H:%M'),
+                line_color=colors[idx%len(colors)],
+            )
+        )
 
     fig.update_layout(template='plotly_dark')
     fig.update_traces(fill='toself')

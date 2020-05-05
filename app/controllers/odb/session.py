@@ -117,6 +117,7 @@ class SessionController(BaseUserController):
                             .options(selectinload(ODBSession.engine_load_readings))
                             .options(selectinload(ODBSession.engine_rpm_readings))
                             .options(selectinload(ODBSession.fuel_level_readings))
+                            .options(selectinload(ODBSession.fuel_ratio_readings))
                             .options(selectinload(ODBSession.speed_readings))
         )
 
@@ -126,6 +127,7 @@ class SessionController(BaseUserController):
             sesh['engine_load'] = [r.value for r in session.engine_load_readings]
             sesh['engine_rpm'] = [r.value for r in session.engine_rpm_readings]
             sesh['fuel_level'] = [r.value for r in session.fuel_level_readings]
+            sesh['fuel_ratio'] = [r.value for r in session.fuel_ratio_readings]
             sesh['speed'] = [r.value for r in session.speed_readings]
             data.append(sesh)
 

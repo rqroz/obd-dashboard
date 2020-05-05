@@ -93,25 +93,29 @@ class ODBController(BaseODBController):
                 lng=data[ODBSensorLabels.GPS.LONGITUDE],
                 date=now,
             )
-            LOGGER.info('Saved GPS Reading', **gps_reading.to_dict())
+            LOGGER.info('Saved GPS Reading', lat=gps_reading.lat, lng=gps_reading.lng)
 
-        # Fuel Level
+        # Fuel Sensors
+        fuel_controller = FuelController(db_session=self.db_session)
         if ODBSensorLabels.Fuel.LEVEL in data_keys:
             LOGGER.info('Will save Fuel Level')
-            fuel_controller = FuelController(db_session=self.db_session)
             fuel_level = fuel_controller.register_fuel_level(session, data[ODBSensorLabels.Fuel.LEVEL], now)
-            LOGGER.info('Saved Fuel Level', **fuel_level.to_dict())
+            LOGGER.info('Saved Fuel Level', value=fuel_level.value)
+        if ODBSensorLabels.Fuel.RATIO in data_keys:
+            LOGGER.info('Will save Fuel Ratio')
+            fuel_ratio = fuel_controller.register_fuel_ratio(session, data[ODBSensorLabels.Fuel.RATIO], now)
+            LOGGER.info('Saved Fuel Ratio', value=fuel_ratio.value)
 
-        # Engine sensors
+        # Engine Sensors
         engine_controller = EngineController(db_session=self.db_session)
         if ODBSensorLabels.Engine.LOAD in data_keys:
             LOGGER.info('Will save Engine Load value')
             load = engine_controller.register_load(session, data[ODBSensorLabels.Engine.LOAD], now)
-            LOGGER.info('Saved Engine Load', **load.to_dict())
+            LOGGER.info('Saved Engine Load', value=load.value)
         if ODBSensorLabels.Engine.RPM in data_keys:
             LOGGER.info('Will save Engine RPM value')
             rpm = engine_controller.register_rpm(session, data[ODBSensorLabels.Engine.RPM], now)
-            LOGGER.info('Saved Engine RPM', **rpm.to_dict())
+            LOGGER.info('Saved Engine RPM', value=rpm.value)
 
     def process_csv(self, user: User, csv_file):
         """
@@ -143,5 +147,6 @@ class ODBController(BaseODBController):
 
         fuel_controller = FuelController(db_session=self.db_session)
         fuel_controller.register_fuel_level_from_csv(session, csv, flush=True)
+        fuel_controller.register_fuel_ratio_from_csv(session, csv, flush=True)
 
         self.db_session.commit()
