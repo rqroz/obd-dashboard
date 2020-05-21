@@ -13,7 +13,15 @@ from app.constants.odb import (
 )
 from app.controllers.odb import BaseODBSensorController
 from app.models.odb.session import ODBSession
-from app.models.odb.engine import EngineLoad, EngineRPM, Speed
+from app.models.odb.engine import (
+    EngineLoad,
+    EngineRPM,
+    EngineCoolantTemp,
+    EngineVoltage,
+    ManifoldPressure,
+    MassAirFlow,
+    Speed,
+)
 from app.models.user import User
 
 
@@ -43,12 +51,40 @@ class EngineController(BaseODBSensorController):
         """
         return self._get_average(EngineRPM, user)
 
+    def register_coolant_temp_from_csv(self, session: ODBSession, csv: DataFrame, flush: bool = False):
+        """
+        Will read and store data related to the engine coolant temperature from CSV for the current user.
+        """
+        value_key = CSV_COLUM_SENSOR_MAP[ODBSensorLabels.Engine.COOLANT_TEMP]
+        self._register_values_csv(EngineCoolantTemp, value_key, session, csv, flush)
+
     def register_load_from_csv(self, session: ODBSession, csv: DataFrame, flush: bool = False):
         """
         Will read and store data related to the engine load from CSV for the current user.
         """
         value_key = CSV_COLUM_SENSOR_MAP[ODBSensorLabels.Engine.LOAD]
         self._register_values_csv(EngineLoad, value_key, session, csv, flush)
+
+    def register_voltage_from_csv(self, session: ODBSession, csv: DataFrame, flush: bool = False):
+        """
+        Will read and store data related to the engine voltage from CSV for the current user.
+        """
+        value_key = CSV_COLUM_SENSOR_MAP[ODBSensorLabels.Engine.VOLTAGE]
+        self._register_values_csv(EngineVoltage, value_key, session, csv, flush)
+
+    def register_map_from_csv(self, session: ODBSession, csv: DataFrame, flush: bool = False):
+        """
+        Will read and store data related to the engine MAP from CSV for the current user.
+        """
+        value_key = CSV_COLUM_SENSOR_MAP[ODBSensorLabels.Engine.MAP]
+        self._register_values_csv(ManifoldPressure, value_key, session, csv, flush)
+
+    def register_maf_from_csv(self, session: ODBSession, csv: DataFrame, flush: bool = False):
+        """
+        Will read and store data related to the engine MAF from CSV for the current user.
+        """
+        value_key = CSV_COLUM_SENSOR_MAP[ODBSensorLabels.Engine.MAF]
+        self._register_values_csv(MassAirFlow, value_key, session, csv, flush)
 
     def register_rpm_from_csv(self, session: ODBSession, csv: DataFrame, flush: bool = False):
         """
@@ -64,14 +100,44 @@ class EngineController(BaseODBSensorController):
         value_key = CSV_COLUM_SENSOR_MAP[ODBSensorLabels.Engine.SPEED]
         self._register_values_csv(Speed, value_key, session, csv, flush)
 
+    def register_coolant_temp(self, session: ODBSession, value: Decimal, date: datetime.datetime):
+        """
+        Will save an EngineCoolantTemp record on the database.
+        """
+        return self._register_value(EngineCoolantTemp, session, value, date)
+
     def register_load(self, session: ODBSession, value: Decimal, date: datetime.datetime):
         """
         Will save an EngineLoad record on the database.
         """
         return self._register_value(EngineLoad, session, value, date)
 
+    def register_maf(self, session: ODBSession, value: Decimal, date: datetime.datetime):
+        """
+        Will save an MassAirFlow record on the database.
+        """
+        return self._register_value(MassAirFlow, session, value, date)
+
+    def register_map(self, session: ODBSession, value: Decimal, date: datetime.datetime):
+        """
+        Will save an ManifoldPressure record on the database.
+        """
+        return self._register_value(ManifoldPressure, session, value, date)
+
     def register_rpm(self, session: ODBSession, value: Decimal, date: datetime.datetime):
         """
         Will save an EngineRPM record on the database.
         """
         return self._register_value(EngineRPM, session, value, date)
+
+    def register_voltage(self, session: ODBSession, value: Decimal, date: datetime.datetime):
+        """
+        Will save an EngineVoltage record on the database.
+        """
+        return self._register_value(EngineVoltage, session, value, date)
+
+    def register_speed(self, session: ODBSession, value: Decimal, date: datetime.datetime):
+        """
+        Will save an Speed record on the database.
+        """
+        return self._register_value(Speed, session, value, date)

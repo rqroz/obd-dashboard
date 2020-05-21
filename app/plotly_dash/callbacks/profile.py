@@ -26,6 +26,9 @@ def get_polar_value(sequence: List[Decimal]):
         return 0
 
     max_val = max(sequence)
+    if max_val == 0:
+        return 0
+
     return sum([val/max_val for val in sequence])/sequence_length
 
 
@@ -44,17 +47,23 @@ def gen_radar_graph_figure(session_ids: List[int]):
         fig.add_trace(
             go.Scatterpolar(
                 r=[
-                    get_polar_value(session['engine_load']),
-                    get_polar_value([rpm/100 for rpm in session['engine_rpm']]),
-                    get_polar_value(session['fuel_level']),
-                    get_polar_value(session['fuel_ratio']),
+                    get_polar_value(session['engine']['load']),
+                    get_polar_value(session['engine']['rpm']),
+                    get_polar_value(session['engine']['maf']),
+                    get_polar_value(session['engine']['map']),
+                    get_polar_value(session['engine']['temp']),
+                    get_polar_value(session['fuel']['ratio']),
+                    get_polar_value(session['fuel']['lambda']),
                     get_polar_value(session['speed']),
                 ],
                 theta=[
                     'Engine Load',
                     'Engine RPM',
-                    'Fuel Level',
+                    'Mass Air Flow',
+                    'Manifold Pressure',
+                    'Engine Coolant Temperature',
                     'Fuel Ratio',
+                    'Commanded Equivalence Ratio (lambda)',
                     'Speed',
                 ],
                 name=session['date'].strftime('%d/%m/%Y %H:%M'),

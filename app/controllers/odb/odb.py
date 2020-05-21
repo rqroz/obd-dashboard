@@ -105,6 +105,10 @@ class ODBController(BaseODBController):
             LOGGER.info('Will save Fuel Ratio')
             fuel_ratio = fuel_controller.register_fuel_ratio(session, data[ODBSensorLabels.Fuel.RATIO], now)
             LOGGER.info('Saved Fuel Ratio', value=fuel_ratio.value)
+        if ODBSensorLabels.Fuel.LAMBDA in data_keys:
+            LOGGER.info('Will save Commanded Equivalence Ratio (lambda)')
+            cer_lambda = fuel_controller.register_fuel_lambda(session, data[ODBSensorLabels.Fuel.LAMBDA], now)
+            LOGGER.info('Saved Commanded Equivalence Ratio', value=cer_lambda.value)
 
         # Engine Sensors
         engine_controller = EngineController(db_session=self.db_session)
@@ -116,6 +120,30 @@ class ODBController(BaseODBController):
             LOGGER.info('Will save Engine RPM value')
             rpm = engine_controller.register_rpm(session, data[ODBSensorLabels.Engine.RPM], now)
             LOGGER.info('Saved Engine RPM', value=rpm.value)
+        if ODBSensorLabels.Engine.SPEED in data_keys:
+            LOGGER.info('Will save speed value')
+            speed = engine_controller.register_speed(session, data[ODBSensorLabels.Engine.SPEED], now)
+            LOGGER.info('Saved speed', value=speed.value)
+        if ODBSensorLabels.Engine.COOLANT_TEMP in data_keys:
+            LOGGER.info('Will save engine coolant temperature')
+            coolant_temp = engine_controller.register_coolant_temp(
+                session,
+                data[ODBSensorLabels.Engine.COOLANT_TEMP],
+                now,
+            )
+            LOGGER.info('Saved coolant temp', value=coolant_temp.value)
+        if ODBSensorLabels.Engine.VOLTAGE in data_keys:
+            LOGGER.info('Will save battery voltage')
+            battery_v = engine_controller.register_voltage(session, data[ODBSensorLabels.Engine.VOLTAGE], now)
+            LOGGER.info('Saved battery voltage', value=battery_v.value)
+        if ODBSensorLabels.Engine.MAF in data_keys:
+            LOGGER.info('Will save MAF')
+            maf = engine_controller.register_maf(session, data[ODBSensorLabels.Engine.MAF], now)
+            LOGGER.info('Saved MAF', value=maf.value)
+        if ODBSensorLabels.Engine.MAP in data_keys:
+            LOGGER.info('Will save MAP')
+            map = engine_controller.register_map(session, data[ODBSensorLabels.Engine.MAP], now)
+            LOGGER.info('Saved MAP', value=map.value)
 
     def process_csv(self, user: User, csv_file):
         """
@@ -144,9 +172,14 @@ class ODBController(BaseODBController):
         engine_controller.register_load_from_csv(session, csv, flush=True)
         engine_controller.register_rpm_from_csv(session, csv, flush=True)
         engine_controller.register_speed_from_csv(session, csv, flush=True)
+        engine_controller.register_map_from_csv(session, csv, flush=True)
+        engine_controller.register_maf_from_csv(session, csv, flush=True)
+        engine_controller.register_voltage_from_csv(session, csv, flush=True)
+        engine_controller.register_coolant_temp_from_csv(session, csv, flush=True)
 
         fuel_controller = FuelController(db_session=self.db_session)
         fuel_controller.register_fuel_level_from_csv(session, csv, flush=True)
         fuel_controller.register_fuel_ratio_from_csv(session, csv, flush=True)
+        fuel_controller.register_fuel_lambda_from_csv(session, csv, flush=True)
 
         self.db_session.commit()

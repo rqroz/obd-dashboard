@@ -116,18 +116,28 @@ class SessionController(BaseUserController):
                             )
                             .options(selectinload(ODBSession.engine_load_readings))
                             .options(selectinload(ODBSession.engine_rpm_readings))
-                            .options(selectinload(ODBSession.fuel_level_readings))
+                            .options(selectinload(ODBSession.engine_maf_readings))
+                            .options(selectinload(ODBSession.engine_map_readings))
+                            .options(selectinload(ODBSession.engine_coolant_temp_readings))
                             .options(selectinload(ODBSession.fuel_ratio_readings))
+                            .options(selectinload(ODBSession.fuel_lambda_readings))
                             .options(selectinload(ODBSession.speed_readings))
         )
 
         data = []
         for session in sessions:
             sesh = session.to_dict()
-            sesh['engine_load'] = [r.value for r in session.engine_load_readings]
-            sesh['engine_rpm'] = [r.value for r in session.engine_rpm_readings]
-            sesh['fuel_level'] = [r.value for r in session.fuel_level_readings]
-            sesh['fuel_ratio'] = [r.value for r in session.fuel_ratio_readings]
+            sesh['engine'] = {
+                'load': [r.value for r in session.engine_load_readings],
+                'rpm': [r.value for r in session.engine_rpm_readings],
+                'maf': [r.value for r in session.engine_maf_readings],
+                'map': [r.value for r in session.engine_map_readings],
+                'temp': [r.value for r in session.engine_coolant_temp_readings],
+            }
+            sesh['fuel'] = {
+                'ratio': [r.value for r in session.fuel_ratio_readings],
+                'lambda': [r.value for r in session.fuel_lambda_readings],
+            }
             sesh['speed'] = [r.value for r in session.speed_readings]
             data.append(sesh)
 

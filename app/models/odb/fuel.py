@@ -13,3 +13,8 @@ class FuelLevel(DATABASE.Model, ODBSensorValueMixin):
 class FuelRatio(DATABASE.Model, ODBSensorValueMixin):
     """ Readings for Fuel Ratio data from ODB sensors. """
     __tablename__ = 'odb_fuel_ratio'
+
+
+class FuelLambda(DATABASE.Model, ODBSensorValueMixin):
+    """ Readings for Engine RPM data from ODB sensors. """
+    __tablename__ = 'odb_fuel_lambda'
