@@ -27,7 +27,7 @@ class ODBSensorLabels:
         SPEED = 'kd'
         VOLTAGE = 'k42'
         MAF = 'k10'
-        MAP = 'k0b'
+        MAP = 'kb'
         COOLANT_TEMP = 'k5'
 
 
