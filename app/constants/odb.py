@@ -49,4 +49,4 @@ CSV_COLUM_SENSOR_MAP = {
 
 
 class BatteryLevel:
-    MIN = 13.7
+    MIN = 13.5
