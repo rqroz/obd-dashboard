@@ -75,7 +75,9 @@ export default {
           this.dialog = false;
           window.location.reload();
         })
-        .catch(() => this.error = 'Unable to process file')
+        .catch((error) => {
+          this.error = error.response.data.message || 'Unable to process file';
+        })
         .then(() => this.loading = false);
     },
   },

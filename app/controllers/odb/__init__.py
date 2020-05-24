@@ -20,47 +20,32 @@ class BaseODBController(BaseController):
 
 
 class BaseODBSensorController(BaseODBController):
-    """ Base ODB Controller """
-    def _register_values_csv(self,
-                             db_model: any,
-                             value_key: str,
-                             session: ODBSession,
-                             csv: DataFrame,
-                             flush: bool = False):
-        """
-        Will read and store data related to the engine load from CSV for the current user.
-        """
-        for idx, row in csv.iterrows():
-            try:
-                eng_load = db_model(
-                    session_id=session.id,
-                    value=row[value_key],
-                    date=self._resolve_date_from_csv_row(row),
-                )
-            except:
-                continue
+    """ Base ODB Sensor Controller """
+    MODEL_MAP = {} # To be overriden by subclasses
 
-            self.db_session.add(eng_load)
-
-        if flush:
-            self.db_session.flush()
-        else:
-            self.db_session.commit()
-
-    def _register_value(self, db_model: any, session: ODBSession, value: Decimal, date: datetime.datetime):
+    def create_sensor_values_csv(self, session: ODBSession, csv: DataFrame):
         """
-        Stores a new value within <db_model>'s table.
+        Creates a list of sensor instances from a TORQUE generated CSV for each of the sensors in <MODEL_MAP>.
 
         Args:
-            - db_model (any): Target database model.
-            - session (app.models.odb.session.ODBSession): Session to be attached to value.
-            - value (decimal.Decimal): Value to be stored.
-            - date (datetime.datetime): Date corresponding to the capture of that value.
+            - session (app.models.odb.session.ODBSession): Session to attach GPS reading instance;
+            - csv (DataFrame): A dataframe representation of the TORQUE generated CSV.
 
         Returns:
-            - ins (any): Instace of <db_model> saved on the database.
+            - (dict): Map of readings per sensor.
         """
-        ins = db_model(session_id=session.id, value=value, date=date)
-        self.db_session.add(ins)
-        self.db_session.commit()
-        return ins
+        return {key: model.create_from_csv(session, csv) for key, model in self.MODEL_MAP.items()}
+
+    def create_sensor_values_torque(self, session: ODBSession, request_data: dict, date: datetime.datetime):
+        """
+        Creates an instance from each of the sensors in <MODEL_MAP>, based on TORQUE's request data.
+
+        Args:
+            - session (app.models.odb.session.ODBSession): Current session to attach instance to;
+            - request_data (dict): Request data from TORQUE.
+            - date (datetime.datetime): Date to attach to instance.
+
+        Returns:
+            - (dict): Map of instance per sensor.
+        """
+        return {key: model.create_from_torque(session, request_data, date) for key, model in self.MODEL_MAP.items()}

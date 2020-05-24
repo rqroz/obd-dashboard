@@ -35,6 +35,7 @@ class ODBController(BaseODBController):
         - PREFIXES (app.constants.odb.ODBSensorPrefixes): Set of prefixes used to extract data from TORQUE request.
     """
     PREFIXES = ODBSensorPrefixes
+    SENSOR_CONTROLLER_CLASSES = [GPSController, EngineController, FuelController]
 
     def _resolve_user(self, data: dict):
         """
@@ -71,8 +72,8 @@ class ODBController(BaseODBController):
             - data (dict): Data to be processed.
         """
         LOGGER.info('Receiving sensor data from TORQUE', **data)
-        has_full_name_keys = any(filter(re.compile(f'{self.PREFIXES.FULL_NAME}.*').match, data.keys()))
-        if has_full_name_keys:
+        has_non_value_keys = any(filter(re.compile(f'.*(unit|user).*', re.IGNORECASE).match, data.keys()))
+        if has_non_value_keys:
             LOGGER.info('Will ignore request since it\'s related to sensor params')
             return
 
@@ -81,69 +82,19 @@ class ODBController(BaseODBController):
         session = SessionController(user_id=user.id).get_or_create(data['session'])
         LOGGER.info('Resolved session to proceed', **session.to_dict())
         now = datetime.datetime.now()
-        data_keys = list(data.keys())
 
-        # GPS Reading
-        if ODBSensorLabels.GPS.LATITUDE in data_keys and ODBSensorLabels.GPS.LONGITUDE in data_keys:
-            LOGGER.info('Will save GPS reading')
-            gps_controller = GPSController(db_session=self.db_session)
-            gps_reading = gps_controller.register_gps_reading(
-                session=session,
-                lat=data[ODBSensorLabels.GPS.LATITUDE],
-                lng=data[ODBSensorLabels.GPS.LONGITUDE],
-                date=now,
-            )
-            LOGGER.info('Saved GPS Reading', lat=gps_reading.lat, lng=gps_reading.lng)
+        sensor_values = []
+        for controller_class in self.SENSOR_CONTROLLER_CLASSES:
+            controller = controller_class(db_session=self.db_session)
+            sensor_values += [
+                val
+                for val
+                in controller.create_sensor_values_torque(session, data, now).values()
+                if val
+            ]
 
-        # Fuel Sensors
-        fuel_controller = FuelController(db_session=self.db_session)
-        if ODBSensorLabels.Fuel.LEVEL in data_keys:
-            LOGGER.info('Will save Fuel Level')
-            fuel_level = fuel_controller.register_fuel_level(session, data[ODBSensorLabels.Fuel.LEVEL], now)
-            LOGGER.info('Saved Fuel Level', value=fuel_level.value)
-        if ODBSensorLabels.Fuel.RATIO in data_keys:
-            LOGGER.info('Will save Fuel Ratio')
-            fuel_ratio = fuel_controller.register_fuel_ratio(session, data[ODBSensorLabels.Fuel.RATIO], now)
-            LOGGER.info('Saved Fuel Ratio', value=fuel_ratio.value)
-        if ODBSensorLabels.Fuel.LAMBDA in data_keys:
-            LOGGER.info('Will save Commanded Equivalence Ratio (lambda)')
-            cer_lambda = fuel_controller.register_fuel_lambda(session, data[ODBSensorLabels.Fuel.LAMBDA], now)
-            LOGGER.info('Saved Commanded Equivalence Ratio', value=cer_lambda.value)
-
-        # Engine Sensors
-        engine_controller = EngineController(db_session=self.db_session)
-        if ODBSensorLabels.Engine.LOAD in data_keys:
-            LOGGER.info('Will save Engine Load value')
-            load = engine_controller.register_load(session, data[ODBSensorLabels.Engine.LOAD], now)
-            LOGGER.info('Saved Engine Load', value=load.value)
-        if ODBSensorLabels.Engine.RPM in data_keys:
-            LOGGER.info('Will save Engine RPM value')
-            rpm = engine_controller.register_rpm(session, data[ODBSensorLabels.Engine.RPM], now)
-            LOGGER.info('Saved Engine RPM', value=rpm.value)
-        if ODBSensorLabels.Engine.SPEED in data_keys:
-            LOGGER.info('Will save speed value')
-            speed = engine_controller.register_speed(session, data[ODBSensorLabels.Engine.SPEED], now)
-            LOGGER.info('Saved speed', value=speed.value)
-        if ODBSensorLabels.Engine.COOLANT_TEMP in data_keys:
-            LOGGER.info('Will save engine coolant temperature')
-            coolant_temp = engine_controller.register_coolant_temp(
-                session,
-                data[ODBSensorLabels.Engine.COOLANT_TEMP],
-                now,
-            )
-            LOGGER.info('Saved coolant temp', value=coolant_temp.value)
-        if ODBSensorLabels.Engine.VOLTAGE in data_keys:
-            LOGGER.info('Will save battery voltage')
-            battery_v = engine_controller.register_voltage(session, data[ODBSensorLabels.Engine.VOLTAGE], now)
-            LOGGER.info('Saved battery voltage', value=battery_v.value)
-        if ODBSensorLabels.Engine.MAF in data_keys:
-            LOGGER.info('Will save MAF')
-            maf = engine_controller.register_maf(session, data[ODBSensorLabels.Engine.MAF], now)
-            LOGGER.info('Saved MAF', value=maf.value)
-        if ODBSensorLabels.Engine.MAP in data_keys:
-            LOGGER.info('Will save MAP')
-            map = engine_controller.register_map(session, data[ODBSensorLabels.Engine.MAP], now)
-            LOGGER.info('Saved MAP', value=map.value)
+        self.db_session.bulk_save_objects(sensor_values)
+        self.db_session.commit()
 
     def process_csv(self, user: User, csv_file):
         """
@@ -154,7 +105,12 @@ class ODBController(BaseODBController):
             - user (app.models.user.User): User instance;
             - csv_file (werkzeug.FileStorage): A file representation of the CSV file created by TORQUE.
         """
-        csv = pandas.read_csv(StringIO(csv_file.read().decode('utf-8')), usecols=CSV_COLUM_SENSOR_MAP.values())
+        csv = pandas.read_csv(StringIO(csv_file.read().decode('utf-8')))
+        missing_cols = [col_name for col_name in CSV_COLUM_SENSOR_MAP.values() if col_name not in csv.columns.values]
+        if missing_cols:
+            raise ODBControllerError(f'CSV is missing the following columns: {", ".join(missing_cols)}')
+
+        csv = csv[CSV_COLUM_SENSOR_MAP.values()]
         start_datetime = self._resolve_date_from_csv_row(csv.iloc[0])
         gen_session_id = str(start_datetime.timestamp()).replace('.', '')[:12]
 
@@ -166,9 +122,7 @@ class ODBController(BaseODBController):
         self.db_session.flush()
 
         sensor_values = []
-
-        controller_classes = [GPSController, EngineController, FuelController]
-        for controller_class in controller_classes:
+        for controller_class in self.SENSOR_CONTROLLER_CLASSES:
             controller = controller_class(db_session=self.db_session)
             for sensor_readings in controller.create_sensor_values_csv(session, csv).values():
                 sensor_values += sensor_readings

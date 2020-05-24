@@ -4,6 +4,7 @@ Abstract models.
 import datetime
 
 from pandas import DataFrame
+from structlog import get_logger
 
 from sqlalchemy import Column, ForeignKey, Integer, String, Numeric, DateTime
 from sqlalchemy.ext.declarative import declared_attr
@@ -14,6 +15,9 @@ from app.database import DATABASE
 from app.models import DictDataModel
 from app.models.odb.session import ODBSession
 from app.models.user import User
+
+
+LOGGER = get_logger(__name__)
 
 
 class ODBSensorMixin(DictDataModel):
@@ -47,7 +51,14 @@ class ODBSensorValueMixin(ODBSensorMixin):
     @classmethod
     def create_from_csv(cls, session: ODBSession, csv: DataFrame):
         """
-        Will read and store data related to the engine load from CSV for the current user.
+        Creates a list of instances from a TORQUE generated CSV.
+
+        Args:
+            - session (app.models.odb.session.ODBSession): Current session to attach instance to;
+            - csv (pandas.DataFrame): DataFrame representation of TORQUE generated CSV.
+
+        Returns:
+            - (List[cls]): List of created instances.
         """
         csv_key = CSV_COLUM_SENSOR_MAP[cls.SENSOR_KEY]
 
@@ -65,3 +76,23 @@ class ODBSensorValueMixin(ODBSensorMixin):
             items.append(item)
 
         return items
+
+    @classmethod
+    def create_from_torque(cls, session: ODBSession, request_data: dict, date: datetime.datetime):
+        """
+        Creates an instance from TORQUE's request data.
+
+        Args:
+            - session (app.models.odb.session.ODBSession): Current session to attach instance to;
+            - request_data (dict): Request data from TORQUE.
+            - date (datetime.datetime): Date to attach to instance.
+
+        Returns:
+            - (cls | None): An instance of <cls>, if able to resolve sensor data from the request. Otherwise, None.
+        """
+        if cls.SENSOR_KEY not in request_data:
+            return None
+        else:
+            value = request_data[cls.SENSOR_KEY]
+            LOGGER.info(f'Will create instance of {cls.__name__}', value=value)
+            return cls(session_id=session.id, value=value, date=date)
