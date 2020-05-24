@@ -9,7 +9,7 @@ from io import StringIO
 from typing import List
 from structlog import get_logger
 
-from app.constants.odb import ODBSensorLabels, ODBSensorPrefixes, CSV_COLUM_SENSOR_MAP
+from app.constants.odb import CSV_COLUM_SENSOR_MAP
 from app.controllers.odb import BaseODBController
 from app.controllers.odb.engine import EngineController
 from app.controllers.odb.fuel import FuelController
@@ -32,9 +32,8 @@ class ODBController(BaseODBController):
     Controller class for ODB-related data manipulations.
 
     Attributes:
-        - PREFIXES (app.constants.odb.ODBSensorPrefixes): Set of prefixes used to extract data from TORQUE request.
+        - SENSOR_CONTROLLER_CLASSES (List[BaseODBController]): List of sensor controllers used.
     """
-    PREFIXES = ODBSensorPrefixes
     SENSOR_CONTROLLER_CLASSES = [GPSController, EngineController, FuelController]
 
     def _resolve_user(self, data: dict):
@@ -66,7 +65,7 @@ class ODBController(BaseODBController):
         """
         Process data receive from TORQUE.
         If identifies that the data is composed by keys identifying sensor specs, will register such specs in the DB.
-        Sensors currently considered are described in <ODBSensorLabels>.
+        Sensors currently considered are described in <app.constants.odb.ODBSensorLabels>.
 
         Args:
             - data (dict): Data to be processed.

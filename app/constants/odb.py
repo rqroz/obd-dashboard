@@ -1,14 +1,6 @@
 """
 ODB Specific constants.
 """
-
-class ODBSensorPrefixes:
-    FULL_NAME = 'userFullName'
-    SHORT_NAME = 'userShortName'
-    UNIT = 'userUnit'
-    SENSOR = 'k'
-
-
 class ODBSensorLabels:
     DATE = 'time'
 
