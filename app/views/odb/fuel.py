@@ -20,4 +20,12 @@ class FuelViews:
     @auth_required
     def latest_fuel_level(user):
         """ Retrieves the latest fuel level for the current user """
-        return jsonify({'level': FuelController().get_latest_fuel_level(user)})
+        level = FuelController().get_latest_fuel_level(user)
+        message = None
+        if level < 10:
+            message = 'It\'s time to refuel!'
+
+        return jsonify({
+            'level': level,
+            'message': message,
+        })

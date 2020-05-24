@@ -1,3 +1,9 @@
+<style scoped>
+.cursor-help {
+  cursor: help;
+}
+</style>
+
 <template>
   <v-skeleton-loader
     type="list-item-three-line"
@@ -7,7 +13,19 @@
       <v-card-title class="subtitle-1 font-weight-regular">
         {{ title || '-' }}
         <v-spacer />
-        <v-icon v-if="icon">{{ icon }}</v-icon>
+        <span v-if="icon">
+          <v-tooltip v-if="message" bottom>
+            <template v-slot:activator="{ on }">
+              <v-icon v-on="on" class="cursor-help" color="error">
+                {{ icon }}
+              </v-icon>
+            </template>
+            <span>{{ message }}</span>
+          </v-tooltip>
+          <v-icon v-else color="primary">
+            {{ icon }}
+          </v-icon>
+        </span>
       </v-card-title>
       <v-card-subtitle v-if="subtitle">{{ subtitle }}</v-card-subtitle>
     </v-card>
@@ -26,6 +44,7 @@ export default {
       required: true,
     },
     icon: String,
+    message: String,
     subtitle: String,
     title: {
       type: String,

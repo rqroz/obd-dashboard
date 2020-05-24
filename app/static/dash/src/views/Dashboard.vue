@@ -1,8 +1,11 @@
 <template>
   <v-container justify="center">
     <v-row>
-      <v-col md="3">
+      <v-col>
         <user-card />
+      </v-col>
+      <v-col>
+        <battery-card />
       </v-col>
       <v-col>
         <fuel-level-card />
@@ -23,6 +26,7 @@
 </template>
 
 <script>
+import BatteryCard from '@/components/odb/engine/battery/BatteryCard';
 import EngineLoadAverageCard from '@/components/odb/engine/load/AverageCard';
 import EngineRpmAverageCard from '@/components/odb/engine/rpm/AverageCard';
 import FuelLevelCard from '@/components/odb/fuel/FuelLevelCard';
@@ -32,6 +36,7 @@ import UserDriverMap from '@/components/user/DriverMap';
 export default {
   name: 'Home',
   components: {
+    BatteryCard,
     EngineLoadAverageCard,
     EngineRpmAverageCard,
     FuelLevelCard,

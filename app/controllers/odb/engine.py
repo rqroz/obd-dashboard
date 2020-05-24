@@ -29,28 +29,6 @@ class EngineController(BaseODBSensorController):
     """
     Controller class for Engine-related data manipulations.
     """
-    def _get_average(self, engine_class: any, user: User):
-        """
-        Returns the average from the registered values for a certain Engine sensor,
-        considering the complete history of a certain user.
-        """
-        return (
-            self.db_session.query(func.avg(engine_class.value))
-                            .filter(engine_class.session.has(user_id=user.id))
-        ).scalar()
-
-    def get_load_avg(self, user: User):
-        """
-        Returns the average engine load considering the complete history of a certain user.
-        """
-        return self._get_average(EngineLoad, user)
-
-    def get_rpm_avg(self, user: User):
-        """
-        Returns the average engine RPM considering the complete history of a certain user.
-        """
-        return self._get_average(EngineRPM, user)
-
     def register_coolant_temp_from_csv(self, session: ODBSession, csv: DataFrame, flush: bool = False):
         """
         Will read and store data related to the engine coolant temperature from CSV for the current user.
@@ -141,3 +119,34 @@ class EngineController(BaseODBSensorController):
         Will save an Speed record on the database.
         """
         return self._register_value(Speed, session, value, date)
+
+    def _get_average(self, engine_class: any, user: User):
+        """
+        Returns the average from the registered values for a certain Engine sensor,
+        considering the complete history of a certain user.
+        """
+        return (
+            self.db_session.query(func.avg(engine_class.value))
+                            .filter(engine_class.session.has(user_id=user.id))
+        ).scalar()
+
+    def get_load_avg(self, user: User):
+        """
+        Returns the average engine load considering the complete history of a certain user.
+        """
+        return self._get_average(EngineLoad, user)
+
+    def get_rpm_avg(self, user: User):
+        """
+        Returns the average engine RPM considering the complete history of a certain user.
+        """
+        return self._get_average(EngineRPM, user)
+
+    def get_battery_latest_read(self, user: User):
+        engine_voltage = (
+            self.db_session.query(EngineVoltage.value)
+                            .filter(EngineVoltage.session.has(user_id=user.id))
+                            .order_by(EngineVoltage.date.desc())
+                            .first()
+        )
+        return engine_voltage.value if engine_voltage else None

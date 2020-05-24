@@ -1,10 +1,10 @@
 <template>
   <simple-fetch-card
-    icon="mdi-gas-station"
-    subtitle="Fuel Level"
+    icon="mdi-car-battery"
+    subtitle="Battery Status"
     :endpoint="endpoint"
     :message="message"
-    :title="level ? `${level.toFixed(2)} %` : '-'"
+    :title="average ? `${average.toFixed(2)} V` : '-'"
     @success="successHandler"
     @error="errorHandler"
   />
@@ -14,17 +14,18 @@
 import SimpleFetchCard from '@/components/utils/cards/SimpleFetch';
 
 export default {
+  name: 'BatteryCard',
   components: {
     SimpleFetchCard,
   },
   data: () => ({
-    endpoint: '/fuel/level/latest/',
-    level: null,
+    endpoint: '/engine/battery/latest/',
+    average: null,
     message: null,
   }),
   methods: {
     successHandler(response) {
-      this.level = parseFloat(response.data.level);
+      this.average = parseFloat(response.data.value);
       this.message = response.data.message;
     },
     errorHandler(error) {

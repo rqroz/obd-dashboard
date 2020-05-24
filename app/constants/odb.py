@@ -46,3 +46,7 @@ CSV_COLUM_SENSOR_MAP = {
     ODBSensorLabels.Fuel.RATIO: 'Kilometers Per Litre(Instant)(kpl)',
     ODBSensorLabels.Fuel.LAMBDA: 'Commanded Equivalence Ratio(lambda)',
 }
+
+
+class BatteryLevel:
+    MIN = 13.7
