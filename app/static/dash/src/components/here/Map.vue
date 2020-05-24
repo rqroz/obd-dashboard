@@ -50,8 +50,23 @@ export default {
     addPolyLine(pline, color) {
       if (pline.points.length < 2) { return; }
 
+      /*
+      * Will set a max distance threshold between two points when ploting the graph.
+      * If the next point surpass this threshold, it will be in the plot.
+      * The value of 55.56m/s corresponds to 200km/h and will be the threshold considered since we're getting
+      * data from TORQUE at a max rate of 1 request per second,
+      */
+      const maxDistance = 55.56;
       const lineString = new window.H.geo.LineString();
-      pline.points.forEach(point => lineString.pushPoint(point));
+
+      let lastPoint = null;
+      pline.points.forEach(point => {
+        const currPoint = new window.H.geo.Point(point.lat, point.lng);
+        if (lastPoint === null || currPoint.distance(lastPoint) < maxDistance) {
+          lineString.pushPoint(currPoint);
+          lastPoint = currPoint;
+        }
+      });
 
       const lineStyle = {
         strokeColor: color || 'black',
