@@ -5,10 +5,13 @@
         <user-card />
       </v-col>
       <v-col>
+        <fuel-level-card />
+      </v-col>
+      <v-col>
         <battery-card />
       </v-col>
       <v-col>
-        <fuel-level-card />
+        <speed-average-card />
       </v-col>
       <v-col>
         <engine-rpm-average-card />
@@ -29,6 +32,7 @@
 import BatteryCard from '@/components/odb/engine/battery/BatteryCard';
 import EngineLoadAverageCard from '@/components/odb/engine/load/AverageCard';
 import EngineRpmAverageCard from '@/components/odb/engine/rpm/AverageCard';
+import SpeedAverageCard from '@/components/odb/engine/speed/AverageCard';
 import FuelLevelCard from '@/components/odb/fuel/FuelLevelCard';
 import UserCard from '@/components/user/Card';
 import UserDriverMap from '@/components/user/DriverMap';
@@ -39,6 +43,7 @@ export default {
     BatteryCard,
     EngineLoadAverageCard,
     EngineRpmAverageCard,
+    SpeedAverageCard,
     FuelLevelCard,
     UserCard,
     UserDriverMap,

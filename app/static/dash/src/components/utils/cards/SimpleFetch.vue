@@ -16,13 +16,13 @@
         <span v-if="icon">
           <v-tooltip v-if="message" bottom>
             <template v-slot:activator="{ on }">
-              <v-icon v-on="on" class="cursor-help" color="error">
+              <v-icon v-on="on" class="cursor-help" :color="iconColor">
                 {{ icon }}
               </v-icon>
             </template>
             <span>{{ message }}</span>
           </v-tooltip>
-          <v-icon v-else color="primary">
+          <v-icon v-else>
             {{ icon }}
           </v-icon>
         </span>
@@ -44,6 +44,7 @@ export default {
       required: true,
     },
     icon: String,
+    iconColor: String,
     message: String,
     subtitle: String,
     title: {

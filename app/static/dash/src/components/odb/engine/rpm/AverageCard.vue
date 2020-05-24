@@ -1,7 +1,8 @@
 <template>
   <simple-fetch-card
     icon="mdi-gauge"
-    subtitle="Average RPM"
+    subtitle="Historical RPM Average"
+    :dynamic="false"
     :endpoint="endpoint"
     :title="average ? average.toFixed(0) : '-'"
     @success="successHandler"

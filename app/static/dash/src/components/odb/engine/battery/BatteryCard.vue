@@ -4,7 +4,8 @@
     subtitle="Battery Status"
     :endpoint="endpoint"
     :message="message"
-    :title="average ? `${average.toFixed(2)} V` : '-'"
+    :icon-color="iconColor"
+    :title="read ? `${read.toFixed(2)} V` : '-'"
     @success="successHandler"
     @error="errorHandler"
   />
@@ -20,13 +21,18 @@ export default {
   },
   data: () => ({
     endpoint: '/engine/battery/latest/',
-    average: null,
+    read: null,
     message: null,
+    iconColor: null,
   }),
   methods: {
     successHandler(response) {
-      this.average = parseFloat(response.data.value);
-      this.message = response.data.message;
+      const isInDanger = response.data.value < response.data.min;
+      this.message = isInDanger ?
+        'Your battery\'s voltage is under the minimum threshold. Please change the battery ASAP.' :
+        'Your car battery level is within the ideal range.';
+      this.iconColor = isInDanger ? 'error' : 'primary';
+      this.read = parseFloat(response.data.value);
     },
     errorHandler(error) {
       console.log(error);

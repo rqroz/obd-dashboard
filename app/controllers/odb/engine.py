@@ -142,6 +142,12 @@ class EngineController(BaseODBSensorController):
         """
         return self._get_average(EngineRPM, user)
 
+    def get_speed_avg(self, user: User):
+        """
+        Returns the average engine RPM considering the complete history of a certain user.
+        """
+        return self._get_average(Speed, user)
+
     def get_battery_latest_read(self, user: User):
         engine_voltage = (
             self.db_session.query(EngineVoltage.value)
