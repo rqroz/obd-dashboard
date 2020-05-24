@@ -11,13 +11,26 @@ class GPSViews:
     @classmethod
     def add_views(cls, server):
         server.add_url_rule(
-            '/api/gps/locations/',
-            'location_list_view',
-            view_func=cls.location_list_view,
+            '/api/gps/',
+            'gps_list_view',
+            view_func=cls.gps_list_view,
+            methods=('GET',),
+        )
+        server.add_url_rule(
+            '/api/gps/latest/',
+            'gps_latest_view',
+            view_func=cls.gps_latest_view,
             methods=('GET',),
         )
 
     @auth_required
-    def location_list_view(user):
+    def gps_list_view(user):
         """ Retrieves GPS locations registered for the current user """
-        return jsonify({'trips': GPSController().get_gps_readings(user)})
+        return jsonify({
+            'trips': GPSController().get_gps_readings(user)
+        })
+
+    @auth_required
+    def gps_latest_view(user):
+        """ Retrieves the latest GPS coordinates for the current user """
+        return jsonify({'trips': GPSController().get_sensor_latest_value(user)})

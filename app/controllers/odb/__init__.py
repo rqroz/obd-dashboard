@@ -5,6 +5,7 @@ import datetime
 
 from decimal import Decimal
 from pandas import DataFrame
+from sqlalchemy.sql import func
 
 from app.controllers import BaseController
 from app.constants.odb import CSV_COLUM_SENSOR_MAP, ODBSensorLabels
@@ -22,6 +23,41 @@ class BaseODBController(BaseController):
 class BaseODBSensorController(BaseODBController):
     """ Base ODB Sensor Controller """
     MODEL_MAP = {} # To be overriden by subclasses
+
+    def get_sensor_avg(self, user, sensor_key):
+        """
+        Returns the user's historical average (all sessions) for the sensor identified by <sensor_key> in <MODEL_MAP>.
+
+        Args:
+            - user (app.models.user.User): Currently authenticated user.
+
+        Returns:
+            - (decimal.Decimal): Historical average.
+        """
+        model = self.MODEL_MAP[sensor_key]
+        return (
+            self.db_session.query(func.avg(model.value))
+                            .filter(model.session.has(user_id=user.id))
+        ).scalar()
+
+    def get_sensor_latest_value(self, user, sensor_key):
+        """
+        Returns the user's latest value for the sensor identified by <sensor_key> in <MODEL_MAP>.
+
+        Args:
+            - user (app.models.user.User): Currently authenticated user.
+
+        Returns:
+            - (dict): Map of lat and lng values.
+        """
+        model = self.MODEL_MAP[sensor_key]
+        latest = (
+            self.db_session.query(model.value)
+                            .filter(model.session.has(user_id=user.id))
+                            .order_by(model.date.desc())
+                            .first()
+        )
+        return latest.value if latest else None
 
     def create_sensor_values_csv(self, session: ODBSession, csv: DataFrame):
         """

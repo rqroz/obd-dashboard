@@ -1,6 +1,7 @@
 """
 Fuel Controller
 """
+from app.constants.odb import ODBSensorNames
 from app.controllers.odb import BaseODBSensorController
 from app.models.odb.fuel import (
     FuelLevel,
@@ -15,20 +16,7 @@ class FuelController(BaseODBSensorController):
     Controller class for Engine-related data manipulations.
     """
     MODEL_MAP = {
-        'lambda': FuelLambda,
-        'level': FuelLevel,
-        'ratio': FuelRatio,
+        ODBSensorNames.Fuel.LAMBDA: FuelLambda,
+        ODBSensorNames.Fuel.LEVEL: FuelLevel,
+        ODBSensorNames.Fuel.RATIO: FuelRatio,
     }
-
-    def get_latest_fuel_level(self, user: User):
-        """ Get's the last fuel level value for the current user """
-        level = (
-            self.db_session.query(FuelLevel.value)
-                            .filter(FuelLevel.session.has(user_id=user.id))
-                            .order_by(FuelLevel.date.desc())
-                            .first()
-        )
-
-        if level:
-            return level.value
-        return None

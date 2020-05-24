@@ -29,7 +29,7 @@ export default {
     successHandler(response) {
       this.read = parseFloat(response.data.value);
       if (this.read) {
-        const isInDanger = response.data.value < response.data.min;
+        const isInDanger = response.data.value < response.data.min_healthy;
         this.message = isInDanger ?
         'Your battery\'s voltage is under the minimum threshold. Please change the battery ASAP.' :
         'Your car battery level is within the ideal range.';

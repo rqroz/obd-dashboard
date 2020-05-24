@@ -3,6 +3,7 @@ GPS Controller
 """
 from sqlalchemy.orm import selectinload
 
+from app.constants.odb import ODBSensorNames
 from app.controllers.odb import BaseODBSensorController
 from app.models.odb.session import ODBSession
 from app.models.odb.gps import GPSReading
@@ -14,8 +15,31 @@ class GPSController(BaseODBSensorController):
     Controller class for GPS-related data manipulations.
     """
     MODEL_MAP = {
-        'gps': GPSReading,
+        ODBSensorNames.GPS.GPS: GPSReading,
     }
+
+    def get_sensor_avg(self, user, sensor_key):
+        """ We won't be implementing this method for GPS """
+        raise NotImplementedError
+
+    def get_sensor_latest_value(self, user):
+        """
+        Returns the latest read for GPS sensors attached to the current user.
+
+        Args:
+            - user (app.models.user.User): Currently authenticated user.
+
+        Returns:
+            - (dict): Map of lat and lng values.
+        """
+        model = list(self.MODEL_MAP.values())[0]
+        latest = (
+            self.db_session.query(model)
+                            .filter(model.session.has(user_id=user.id))
+                            .order_by(model.date.desc())
+                            .first()
+        )
+        return latest.get_point() if latest else None
 
     def get_gps_readings(self, user: User):
         """

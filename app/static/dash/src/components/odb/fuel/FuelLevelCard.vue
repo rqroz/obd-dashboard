@@ -26,7 +26,7 @@ export default {
   }),
   methods: {
     successHandler(response) {
-      this.level = parseFloat(response.data.level);
+      this.level = parseFloat(response.data.value);
       if (this.level) {
         if (this.level < 25) {
           this.message = 'You are starting to run out of gas...';

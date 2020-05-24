@@ -15,6 +15,8 @@ class ODBSession(DATABASE.Model, DictDataModel):
     """ Readings for GPS data from ODB sensors. """
     __tablename__ = "odb_session"
 
+    protected_fields = ['user_id']
+
     id = Column(String(15), primary_key=True)
     user_id = Column(Integer, ForeignKey(User.id))
     date = Column(DateTime, default=datetime.datetime.utcnow)
