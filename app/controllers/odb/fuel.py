@@ -24,26 +24,22 @@ class FuelController(BaseODBSensorController):
     """
     Controller class for Engine-related data manipulations.
     """
-    def register_fuel_level_from_csv(self, session: ODBSession, csv: DataFrame, flush: bool = False):
+    def create_sensor_values_csv(self, session: ODBSession, csv: DataFrame):
         """
-        Will read and store data related to the fuel level from CSV for the current user.
-        """
-        value_key = CSV_COLUM_SENSOR_MAP[ODBSensorLabels.Fuel.LEVEL]
-        self._register_values_csv(FuelLevel, value_key, session, csv, flush)
+        Creates a list of fuel sensor instances from a TORQUE generated CSV.
 
-    def register_fuel_ratio_from_csv(self, session: ODBSession, csv: DataFrame, flush: bool = False):
-        """
-        Will read and store data related to the fuel ratio from CSV for the current user.
-        """
-        value_key = CSV_COLUM_SENSOR_MAP[ODBSensorLabels.Fuel.RATIO]
-        self._register_values_csv(FuelRatio, value_key, session, csv, flush)
+        Args:
+            - session (app.models.odb.session.ODBSession): Session to attach GPS reading instance;
+            - csv (DataFrame): A dataframe representation of the TORQUE generated CSV.
 
-    def register_fuel_lambda_from_csv(self, session: ODBSession, csv: DataFrame, flush: bool = False):
+        Returns:
+            - (dict): A map of readings per sensor.
         """
-        Will read and store data related to the fuel commanded equivalence from CSV for the current user.
-        """
-        value_key = CSV_COLUM_SENSOR_MAP[ODBSensorLabels.Fuel.LAMBDA]
-        self._register_values_csv(FuelLambda, value_key, session, csv, flush)
+        return {
+            'lambda': FuelLambda.create_from_csv(session, csv),
+            'level': FuelLevel.create_from_csv(session, csv),
+            'ratio': FuelRatio.create_from_csv(session, csv),
+        }
 
     def register_fuel_level(self, session: ODBSession, value: Decimal, date: datetime.datetime):
         """

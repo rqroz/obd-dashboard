@@ -165,21 +165,13 @@ class ODBController(BaseODBController):
         self.db_session.add(session)
         self.db_session.flush()
 
-        gps_controller = GPSController(db_session=self.db_session)
-        gps_controller.register_gps_from_csv(session, csv, flush=True)
+        sensor_values = []
 
-        engine_controller = EngineController(db_session=self.db_session)
-        engine_controller.register_load_from_csv(session, csv, flush=True)
-        engine_controller.register_rpm_from_csv(session, csv, flush=True)
-        engine_controller.register_speed_from_csv(session, csv, flush=True)
-        engine_controller.register_map_from_csv(session, csv, flush=True)
-        engine_controller.register_maf_from_csv(session, csv, flush=True)
-        engine_controller.register_voltage_from_csv(session, csv, flush=True)
-        engine_controller.register_coolant_temp_from_csv(session, csv, flush=True)
+        controller_classes = [GPSController, EngineController, FuelController]
+        for controller_class in controller_classes:
+            controller = controller_class(db_session=self.db_session)
+            for sensor_readings in controller.create_sensor_values_csv(session, csv).values():
+                sensor_values += sensor_readings
 
-        fuel_controller = FuelController(db_session=self.db_session)
-        fuel_controller.register_fuel_level_from_csv(session, csv, flush=True)
-        fuel_controller.register_fuel_ratio_from_csv(session, csv, flush=True)
-        fuel_controller.register_fuel_lambda_from_csv(session, csv, flush=True)
-
+        self.db_session.bulk_save_objects(sensor_values)
         self.db_session.commit()

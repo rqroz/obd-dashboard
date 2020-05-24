@@ -4,7 +4,7 @@
     subtitle="Historical Speed Average"
     :dynamic="false"
     :endpoint="endpoint"
-    :title="average !== null  ? `${average.toFixed(2)} Km/h` : '-'"
+    :title="valid ? `${average.toFixed(2)} Km/h` : '-'"
     @success="successHandler"
     @error="errorHandler"
   />
@@ -21,10 +21,12 @@ export default {
   data: () => ({
     endpoint: '/engine/speed/average/',
     average: null,
+    valid: false,
   }),
   methods: {
     successHandler(response) {
       this.average = parseFloat(response.data.average);
+      this.valid = typeof this.average === 'number';
     },
     errorHandler(error) {
       console.log(error);

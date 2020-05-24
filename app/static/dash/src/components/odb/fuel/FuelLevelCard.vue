@@ -27,15 +27,17 @@ export default {
   methods: {
     successHandler(response) {
       this.level = parseFloat(response.data.level);
-      if (this.level < 25) {
-        this.message = 'You are starting to run out of gas...';
-        this.iconColor = 'warning';
-      } else if (this.level < 10) {
-        this.message = 'Time to refuel!';
-        this.iconColor = 'error';
-      } else {
-        this.message = 'You don\'t need to worry about gas for now.';
-        this.iconColor = 'primary';
+      if (this.level) {
+        if (this.level < 25) {
+          this.message = 'You are starting to run out of gas...';
+          this.iconColor = 'warning';
+        } else if (this.level < 10) {
+          this.message = 'Time to refuel!';
+          this.iconColor = 'error';
+        } else {
+          this.message = 'You don\'t need to worry about gas for now.';
+          this.iconColor = 'primary';
+        }
       }
     },
     errorHandler(error) {

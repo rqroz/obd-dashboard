@@ -29,54 +29,26 @@ class EngineController(BaseODBSensorController):
     """
     Controller class for Engine-related data manipulations.
     """
-    def register_coolant_temp_from_csv(self, session: ODBSession, csv: DataFrame, flush: bool = False):
+    def create_sensor_values_csv(self, session: ODBSession, csv: DataFrame):
         """
-        Will read and store data related to the engine coolant temperature from CSV for the current user.
-        """
-        value_key = CSV_COLUM_SENSOR_MAP[ODBSensorLabels.Engine.COOLANT_TEMP]
-        self._register_values_csv(EngineCoolantTemp, value_key, session, csv, flush)
+        Creates a list of engine sensor instances from a TORQUE generated CSV.
 
-    def register_load_from_csv(self, session: ODBSession, csv: DataFrame, flush: bool = False):
-        """
-        Will read and store data related to the engine load from CSV for the current user.
-        """
-        value_key = CSV_COLUM_SENSOR_MAP[ODBSensorLabels.Engine.LOAD]
-        self._register_values_csv(EngineLoad, value_key, session, csv, flush)
+        Args:
+            - session (app.models.odb.session.ODBSession): Session to attach GPS reading instance;
+            - csv (DataFrame): A dataframe representation of the TORQUE generated CSV.
 
-    def register_voltage_from_csv(self, session: ODBSession, csv: DataFrame, flush: bool = False):
+        Returns:
+            - (dict): A map of readings per sensor.
         """
-        Will read and store data related to the engine voltage from CSV for the current user.
-        """
-        value_key = CSV_COLUM_SENSOR_MAP[ODBSensorLabels.Engine.VOLTAGE]
-        self._register_values_csv(EngineVoltage, value_key, session, csv, flush)
-
-    def register_map_from_csv(self, session: ODBSession, csv: DataFrame, flush: bool = False):
-        """
-        Will read and store data related to the engine MAP from CSV for the current user.
-        """
-        value_key = CSV_COLUM_SENSOR_MAP[ODBSensorLabels.Engine.MAP]
-        self._register_values_csv(ManifoldPressure, value_key, session, csv, flush)
-
-    def register_maf_from_csv(self, session: ODBSession, csv: DataFrame, flush: bool = False):
-        """
-        Will read and store data related to the engine MAF from CSV for the current user.
-        """
-        value_key = CSV_COLUM_SENSOR_MAP[ODBSensorLabels.Engine.MAF]
-        self._register_values_csv(MassAirFlow, value_key, session, csv, flush)
-
-    def register_rpm_from_csv(self, session: ODBSession, csv: DataFrame, flush: bool = False):
-        """
-        Will read and store data related to the engine load from CSV for the current user.
-        """
-        value_key = CSV_COLUM_SENSOR_MAP[ODBSensorLabels.Engine.RPM]
-        self._register_values_csv(EngineRPM, value_key, session, csv, flush)
-
-    def register_speed_from_csv(self, session: ODBSession, csv: DataFrame, flush: bool = False):
-        """
-        Will read and store data related to car speed from CSV for the current user.
-        """
-        value_key = CSV_COLUM_SENSOR_MAP[ODBSensorLabels.Engine.SPEED]
-        self._register_values_csv(Speed, value_key, session, csv, flush)
+        return {
+            'load': EngineLoad.create_from_csv(session, csv),
+            'rmp': EngineRPM.create_from_csv(session, csv),
+            'coolant_temp': EngineCoolantTemp.create_from_csv(session, csv),
+            'battery': EngineVoltage.create_from_csv(session, csv),
+            'map': ManifoldPressure.create_from_csv(session, csv),
+            'maf': MassAirFlow.create_from_csv(session, csv),
+            'speed': Speed.create_from_csv(session, csv),
+        }
 
     def register_coolant_temp(self, session: ODBSession, value: Decimal, date: datetime.datetime):
         """

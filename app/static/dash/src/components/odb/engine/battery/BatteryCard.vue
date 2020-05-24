@@ -27,12 +27,14 @@ export default {
   }),
   methods: {
     successHandler(response) {
-      const isInDanger = response.data.value < response.data.min;
-      this.message = isInDanger ?
+      this.read = parseFloat(response.data.value);
+      if (this.read) {
+        const isInDanger = response.data.value < response.data.min;
+        this.message = isInDanger ?
         'Your battery\'s voltage is under the minimum threshold. Please change the battery ASAP.' :
         'Your car battery level is within the ideal range.';
-      this.iconColor = isInDanger ? 'error' : 'primary';
-      this.read = parseFloat(response.data.value);
+        this.iconColor = isInDanger ? 'error' : 'primary';
+      }
     },
     errorHandler(error) {
       console.log(error);
