@@ -1,5 +1,5 @@
 """
-ODB Controller
+Fuel Controller
 """
 from app.controllers.odb import BaseODBSensorController
 from app.models.odb.fuel import (

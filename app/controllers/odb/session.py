@@ -1,5 +1,5 @@
 """
-ODB Controller
+Session Controller
 """
 from typing import List
 from sqlalchemy.orm import selectinload
