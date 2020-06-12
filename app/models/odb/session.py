@@ -23,17 +23,12 @@ class ODBSession(DATABASE.Model, DictDataModel):
 
     user = relationship(User, uselist=False)
 
-    engine_load_readings = relationship('EngineLoad', uselist=True)
-    engine_rpm_readings = relationship('EngineRPM', uselist=True)
-    engine_map_readings = relationship('ManifoldPressure', uselist=True)
-    engine_maf_readings = relationship('MassAirFlow', uselist=True)
-    engine_voltage_readings = relationship('EngineVoltage', uselist=True)
-    engine_coolant_temp_readings = relationship('EngineCoolantTemp', uselist=True)
+    car_states = relationship('CarState', uselist=True)
 
-    speed_readings = relationship('Speed', uselist=True)
-
-    fuel_level_readings = relationship('FuelLevel', uselist=True)
-    fuel_ratio_readings = relationship('FuelRatio', uselist=True)
-    fuel_lambda_readings = relationship('FuelLambda', uselist=True)
-
-    gps_readings = relationship('GPSReading', uselist=True)
+    def to_flat_data(self):
+        """ Flattens the data for the current session states """
+        return {
+            'id': self.id,
+            'date': self.date,
+            'car_states': [state.to_flat_data() for state in self.car_states],
+        }

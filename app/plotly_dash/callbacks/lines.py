@@ -74,17 +74,18 @@ def register_line_graph_callbacks(dash_app):
         Returns:
             - (dict): Generated line graph figure.
         """
-        session = get_session_controller().get(session_id)
+        session = get_session_controller().get(session_id).to_flat_data()
+        car_states = session['car_states']
+        indexes = [idx for idx, _ in enumerate(car_states)]
 
         items = []
         if session:
             for attr in selected_attrs:
-                readings = getattr(session, attr)
                 item = {
                     'df': pd.DataFrame({
-                        'x': [idx for idx, _ in enumerate(readings)],
-                        'y': [r.value for r in readings],
-                        'date': [r.date for r in readings],
+                        'x': indexes,
+                        'y': [state[attr] for state in car_states],
+                        'date': [state['date'] for state in car_states],
                     }),
                     'title': CHART_TYPE_MAP[attr],
                 }

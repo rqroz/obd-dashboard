@@ -18,10 +18,8 @@ from app.utils.encoders import DefaultJSONEncoder
 # Importing models so that DB is initialized
 from app.models import user
 from app.models.odb import (
-    engine,
-    fuel,
-    gps,
     session,
+    car,
 )
 
 

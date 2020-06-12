@@ -1,30 +1,12 @@
 """
 ODB Specific constants.
 """
-class ODBSensorNames:
-    class GPS:
-        GPS = 'gps'
-
-    class Fuel:
-        LAMBDA = 'lambda'
-        LEVEL = 'level'
-        RATIO = 'ratio'
-
-    class Engine:
-        COOLANT_TEMP = 'coolant'
-        LOAD = 'load'
-        MAF = 'maf'
-        MAP = 'map'
-        RPM = 'rpm'
-        SPEED = 'speed'
-        VOLTAGE = 'battery'
-
-
-class ODBSensorLabels:
-    DATE = 'time'
+class CarSensorID:
+    DATE = 'date'
+    SPEED = 'kd'
+    VOLTAGE = 'k42'
 
     class GPS:
-        LABEL = 'gps'
         LATITUDE = 'kff1006'
         LONGITUDE = 'kff1005'
 
@@ -39,27 +21,25 @@ class ODBSensorLabels:
         MAF = 'k10'
         MAP = 'kb'
         RPM = 'kc'
-        SPEED = 'kd'
-        VOLTAGE = 'k42'
 
 
-CSV_COLUM_SENSOR_MAP = {
-    ODBSensorLabels.DATE: ' Device Time',
+CSV_SENSOR_MAP = {
+    CarSensorID.DATE: ' Device Time',
+    CarSensorID.SPEED: 'Speed (OBD)(km/h)',
+    CarSensorID.VOLTAGE: 'Voltage (Control Module)(V)',
 
-    ODBSensorLabels.GPS.LATITUDE: ' Latitude',
-    ODBSensorLabels.GPS.LONGITUDE: ' Longitude',
+    CarSensorID.GPS.LATITUDE: ' Latitude',
+    CarSensorID.GPS.LONGITUDE: ' Longitude',
 
-    ODBSensorLabels.Engine.COOLANT_TEMP: 'Engine Coolant Temperature',
-    ODBSensorLabels.Engine.LOAD: 'Engine Load(Absolute)(%)',
-    ODBSensorLabels.Engine.MAF: 'Mass Air Flow Rate(g/s)',
-    ODBSensorLabels.Engine.MAP: 'Intake Manifold Pressure(psi)',
-    ODBSensorLabels.Engine.RPM: 'Engine RPM(rpm)',
-    ODBSensorLabels.Engine.SPEED: 'Speed (OBD)(km/h)',
-    ODBSensorLabels.Engine.VOLTAGE: 'Voltage (Control Module)(V)',
+    CarSensorID.Engine.COOLANT_TEMP: 'Engine Coolant Temperature',
+    CarSensorID.Engine.LOAD: 'Engine Load(Absolute)(%)',
+    CarSensorID.Engine.MAF: 'Mass Air Flow Rate(g/s)',
+    CarSensorID.Engine.MAP: 'Intake Manifold Pressure(psi)',
+    CarSensorID.Engine.RPM: 'Engine RPM(rpm)',
 
-    ODBSensorLabels.Fuel.LEVEL: 'Fuel Level (From Engine ECU)(%)',
-    ODBSensorLabels.Fuel.RATIO: 'Kilometers Per Litre(Instant)(kpl)',
-    ODBSensorLabels.Fuel.LAMBDA: 'Commanded Equivalence Ratio(lambda)',
+    CarSensorID.Fuel.LEVEL: 'Fuel Level (From Engine ECU)(%)',
+    CarSensorID.Fuel.RATIO: 'Kilometers Per Litre(Instant)(kpl)',
+    CarSensorID.Fuel.LAMBDA: 'Commanded Equivalence Ratio(lambda)',
 }
 
 

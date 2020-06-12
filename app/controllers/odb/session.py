@@ -7,7 +7,6 @@ from sqlalchemy.sql import func
 
 from app.controllers import BaseUserController
 from app.models.odb.session import ODBSession
-from app.models.odb.engine import EngineLoad
 from app.models.user import User
 
 
@@ -114,31 +113,29 @@ class SessionController(BaseUserController):
                                 ODBSession.user_id == self.user_id,
                                 ODBSession.id.in_(ids),
                             )
-                            .options(selectinload(ODBSession.engine_load_readings))
-                            .options(selectinload(ODBSession.engine_rpm_readings))
-                            .options(selectinload(ODBSession.engine_maf_readings))
-                            .options(selectinload(ODBSession.engine_map_readings))
-                            .options(selectinload(ODBSession.engine_coolant_temp_readings))
-                            .options(selectinload(ODBSession.fuel_ratio_readings))
-                            .options(selectinload(ODBSession.fuel_lambda_readings))
-                            .options(selectinload(ODBSession.speed_readings))
+                            .options(selectinload(ODBSession.car_states))
         )
 
         data = []
         for session in sessions:
             sesh = session.to_dict()
-            sesh['engine'] = {
-                'load': [r.value for r in session.engine_load_readings],
-                'rpm': [r.value for r in session.engine_rpm_readings],
-                'maf': [r.value for r in session.engine_maf_readings],
-                'map': [r.value for r in session.engine_map_readings],
-                'temp': [r.value for r in session.engine_coolant_temp_readings],
-            }
-            sesh['fuel'] = {
-                'ratio': [r.value for r in session.fuel_ratio_readings],
-                'lambda': [r.value for r in session.fuel_lambda_readings],
-            }
-            sesh['speed'] = [r.value for r in session.speed_readings]
+            list_keys = [
+                'engine_load', 'engine_rpm', 'engine_maf', 'engine_map',
+                'engine_coolant_temp', 'fuel_ratio', 'fuel_lambda', 'speed',
+            ]
+            for key in list_keys:
+                sesh[key] = []
+
+            for state in session.car_states:
+                sesh['engine_load'].append(state.engine.load)
+                sesh['engine_rpm'].append(state.engine.rpm)
+                sesh['engine_maf'].append(state.engine.maf)
+                sesh['engine_map'].append(state.engine.map)
+                sesh['engine_coolant_temp'].append(state.engine.coolant_temp)
+                sesh['fuel_ratio'].append(state.fuel.ratio)
+                sesh['fuel_lambda'].append(state.fuel.cmd_equivalence_ratio)
+                sesh['speed'].append(state.speed)
+
             data.append(sesh)
 
         return data

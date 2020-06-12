@@ -9,12 +9,10 @@ from io import StringIO
 from typing import List
 from structlog import get_logger
 
-from app.constants.odb import CSV_COLUM_SENSOR_MAP
-from app.controllers.odb import BaseODBController
-from app.controllers.odb.engine import EngineController
-from app.controllers.odb.fuel import FuelController
-from app.controllers.odb.gps import GPSController
+from app.constants.odb import CSV_SENSOR_MAP
+from app.controllers import BaseController
 from app.controllers.odb.session import SessionController
+from app.models.odb.car import CarState
 from app.models.odb.session import ODBSession
 from app.models.user import User
 
@@ -27,14 +25,19 @@ class ODBControllerError(Exception):
     pass
 
 
-class ODBController(BaseODBController):
+class ODBController(BaseController):
     """
     Controller class for ODB-related data manipulations.
 
     Attributes:
         - SENSOR_CONTROLLER_CLASSES (List[BaseODBController]): List of sensor controllers used.
     """
-    SENSOR_CONTROLLER_CLASSES = [GPSController, EngineController, FuelController]
+    SENSOR_CONTROLLER_CLASSES = []
+
+    def _resolve_date_from_csv_row(self, csv_row: dict):
+        """ Resolves a datetime from a certain row in a CSV """
+        date_str = csv_row[CSV_SENSOR_MAP[CarSensorID.DATE]]
+        return datetime.datetime.strptime(date_str, '%d-%b-%Y %H:%M:%S.%f')
 
     def _resolve_user(self, data: dict):
         """
@@ -65,7 +68,7 @@ class ODBController(BaseODBController):
         """
         Process data receive from TORQUE.
         If identifies that the data is composed by keys identifying sensor specs, will register such specs in the DB.
-        Sensors currently considered are described in <app.constants.odb.ODBSensorLabels>.
+        Sensors currently considered are described in <app.constants.odb.CarSensorID>.
 
         Args:
             - data (dict): Data to be processed.
@@ -105,11 +108,11 @@ class ODBController(BaseODBController):
             - csv_file (werkzeug.FileStorage): A file representation of the CSV file created by TORQUE.
         """
         csv = pandas.read_csv(StringIO(csv_file.read().decode('utf-8')))
-        missing_cols = [col_name for col_name in CSV_COLUM_SENSOR_MAP.values() if col_name not in csv.columns.values]
+        missing_cols = [col_name for col_name in CSV_SENSOR_MAP.values() if col_name not in csv.columns.values]
         if missing_cols:
             raise ODBControllerError(f'CSV is missing the following columns: {", ".join(missing_cols)}')
 
-        csv = csv[CSV_COLUM_SENSOR_MAP.values()]
+        csv = csv[CSV_SENSOR_MAP.values()]
         start_datetime = self._resolve_date_from_csv_row(csv.iloc[0])
         gen_session_id = str(start_datetime.timestamp()).replace('.', '')[:12]
 
@@ -120,11 +123,5 @@ class ODBController(BaseODBController):
         self.db_session.add(session)
         self.db_session.flush()
 
-        sensor_values = []
-        for controller_class in self.SENSOR_CONTROLLER_CLASSES:
-            controller = controller_class(db_session=self.db_session)
-            for sensor_readings in controller.create_sensor_values_csv(session, csv).values():
-                sensor_values += sensor_readings
-
-        self.db_session.bulk_save_objects(sensor_values)
+        _ = CarState.create_from_csv(self.db_session, session, csv)
         self.db_session.commit()

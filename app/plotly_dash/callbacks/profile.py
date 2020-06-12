@@ -47,13 +47,13 @@ def gen_radar_graph_figure(session_ids: List[int]):
         fig.add_trace(
             go.Scatterpolar(
                 r=[
-                    get_polar_value(session['engine']['load']),
-                    get_polar_value(session['engine']['rpm']),
-                    get_polar_value(session['engine']['maf']),
-                    get_polar_value(session['engine']['map']),
-                    get_polar_value(session['engine']['temp']),
-                    get_polar_value(session['fuel']['ratio']),
-                    get_polar_value(session['fuel']['lambda']),
+                    get_polar_value(session['engine_load']),
+                    get_polar_value(session['engine_rpm']),
+                    get_polar_value(session['engine_maf']),
+                    get_polar_value(session['engine_map']),
+                    get_polar_value(session['engine_coolant_temp']),
+                    get_polar_value(session['fuel_ratio']),
+                    get_polar_value(session['fuel_lambda']),
                     get_polar_value(session['speed']),
                 ],
                 theta=[
