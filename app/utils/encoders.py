@@ -11,7 +11,7 @@ from flask.json import JSONEncoder
 class DefaultJSONEncoder(JSONEncoder):
     def default(self, obj):
         if isinstance(obj, Decimal):
-            return str(obj)
+            return float(obj)
 
         if isinstance(obj, datetime.datetime):
             return obj.isoformat()

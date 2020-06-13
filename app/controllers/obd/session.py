@@ -168,9 +168,9 @@ class SessionController(BaseUserController):
         )
 
         data = {
-            'fuel_level': float(latest_state.fuel.level) if latest_state else None,
+            'fuel_level': latest_state.fuel.level if latest_state else None,
             'battery': {
-                'latest': float(latest_state.voltage) if latest_state else None,
+                'latest': latest_state.voltage if latest_state else None,
                 'threshold': BatteryLevel.MIN,
             },
             'speed_avg': speed_average,
