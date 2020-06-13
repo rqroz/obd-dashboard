@@ -7,6 +7,13 @@ class CarSensorID:
 
     SPEED = 'kd'
     VOLTAGE = 'k42'
+    THROTTLE_POSITION = 'k11'
+
+    class Accelerometer:
+        TOTAL = 'kff1223'
+        X = 'kff1220'
+        Y = 'kff1221'
+        Z = 'kff1222'
 
     class GPS:
         LATITUDE = 'kff1006'
@@ -29,6 +36,12 @@ CSV_SENSOR_MAP = {
     CarSensorID.DATE: ' Device Time',
     CarSensorID.SPEED: 'Speed (OBD)(km/h)',
     CarSensorID.VOLTAGE: 'Voltage (Control Module)(V)',
+    CarSensorID.THROTTLE_POSITION: 'Throttle Position(Manifold)(%)',
+
+    CarSensorID.Accelerometer.TOTAL: 'Acceleration Sensor(Total)(g)',
+    CarSensorID.Accelerometer.X: 'Acceleration Sensor(X axis)(g)',
+    CarSensorID.Accelerometer.Y: 'Acceleration Sensor(Y axis)(g)',
+    CarSensorID.Accelerometer.Z: 'Acceleration Sensor(Z axis)(g)',
 
     CarSensorID.GPS.LATITUDE: ' Latitude',
     CarSensorID.GPS.LONGITUDE: ' Longitude',

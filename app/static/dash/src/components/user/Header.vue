@@ -7,7 +7,7 @@
       <simple-card
         :icon="fuel.icon"
         :subtitle="fuel.subtitle"
-        :message="fuel.messages"
+        :message="fuel.message"
         :icon-color="fuel.iconColor"
         :title="fuel.level ? `${fuel.level.toFixed(2)} %` : '-'"
       />
@@ -16,7 +16,7 @@
       <simple-card
         :icon="battery.icon"
         :subtitle="battery.subtitle"
-        :message="battery.messages"
+        :message="battery.message"
         :icon-color="battery.iconColor"
         :title="battery.value ? `${battery.value.toFixed(2)} V` : '-'"
       />

@@ -18,6 +18,17 @@ from app.models.odb.session import ODBSession
 LOGGER = get_logger(__name__)
 
 
+class Acceletometer(DATABASE.Model, DictDataModel):
+    """ Acceletometer-specific model """
+    __tablename__ = 'acceletometer_state'
+
+    id = Column(Integer, primary_key=True)
+    x = Column(Numeric, nullable=False)
+    y = Column(Numeric, nullable=False)
+    z = Column(Numeric, nullable=False)
+    total = Column(Numeric, nullable=False)
+
+
 class Engine(DATABASE.Model, DictDataModel):
     """ Engine-specific model """
     __tablename__ = 'engine_state'
@@ -58,16 +69,19 @@ class CarState(DATABASE.Model, DictDataModel):
 
     id = Column(Integer, primary_key=True)
     session_id = Column(String, ForeignKey(ODBSession.id))
+    acceletometer_id = Column(Integer, ForeignKey(Acceletometer.id))
     engine_id = Column(Integer, ForeignKey(Engine.id))
     fuel_id = Column(Integer, ForeignKey(Fuel.id))
     gps_id = Column(Integer, ForeignKey(GPSReading.id))
 
     speed = Column(Numeric, nullable=False)
     voltage = Column(Numeric, nullable=False)
+    throttle_position = Column(Numeric, nullable=False)
     timestamp = Column(String(25))
 
     date = Column(DateTime, default=datetime.datetime.utcnow)
 
+    acceletometer = relationship(Acceletometer, uselist=False)
     engine = relationship(Engine, uselist=False)
     fuel = relationship(Fuel, uselist=False)
     gps = relationship(GPSReading, uselist=False)
@@ -76,10 +90,12 @@ class CarState(DATABASE.Model, DictDataModel):
     def to_dict(self, include_protected=False):
         data = super(CarState, self).to_dict(include_protected)
         data.update({
+            'acceletometer': self.acceletometer.to_dict(),
             'engine': self.engine.to_dict(),
             'fuel': self.fuel.to_dict(),
             'gps': self.gps.to_dict(),
         })
+        data.pop('acceletometer_id')
         data.pop('engine_id')
         data.pop('fuel_id')
         data.pop('gps_id')
@@ -91,8 +107,13 @@ class CarState(DATABASE.Model, DictDataModel):
             'id': self.id,
             'speed': self.speed,
             'voltage': self.voltage,
+            'throttle_position': self.throttle_position,
             'date': self.date,
             'timestamp': self.timestamp,
+            'acceletometer_total': self.acceletometer.total,
+            'acceletometer_x': self.acceletometer.x,
+            'acceletometer_y': self.acceletometer.y,
+            'acceletometer_z': self.acceletometer.z,
             'engine_coolant_temp': self.engine.coolant_temp,
             'engine_load': self.engine.load,
             'engine_maf': self.engine.maf,
@@ -119,6 +140,14 @@ class CarState(DATABASE.Model, DictDataModel):
         car_states = []
         for _, row in csv.iterrows():
             try:
+                acceletometer = Acceletometer(
+                    total=row_value(row, CarSensorID.Accelerometer.TOTAL),
+                    x=row_value(row, CarSensorID.Accelerometer.X),
+                    y=row_value(row, CarSensorID.Accelerometer.Y),
+                    z=row_value(row, CarSensorID.Accelerometer.Z),
+                )
+                db_session.add(acceletometer)
+
                 gps = GPSReading(
                     lat=row_value(row, CarSensorID.GPS.LATITUDE),
                     lng=row_value(row, CarSensorID.GPS.LONGITUDE),
@@ -146,6 +175,7 @@ class CarState(DATABASE.Model, DictDataModel):
                 date_str = row_value(row, CarSensorID.DATE)
                 date = datetime.datetime.strptime(date_str, '%d-%b-%Y %H:%M:%S.%f')
                 curr_state = cls(
+                    acceletometer_id=acceletometer.id,
                     engine_id=engine.id,
                     fuel_id=fuel.id,
                     gps_id=gps.id,
@@ -153,6 +183,7 @@ class CarState(DATABASE.Model, DictDataModel):
                     date=date,
                     speed=row_value(row, CarSensorID.SPEED),
                     voltage=row_value(row, CarSensorID.VOLTAGE),
+                    throttle_position=row_value(row, CarSensorID.THROTTLE_POSITION),
                     timestamp=str(date.timestamp()).replace('.', '')[:13],
                 )
                 db_session.add(curr_state)

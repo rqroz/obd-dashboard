@@ -13,7 +13,7 @@ from app.models.user import User
 
 class ODBSession(DATABASE.Model, DictDataModel):
     """ Readings for GPS data from ODB sensors. """
-    __tablename__ = "odb_session"
+    __tablename__ = "obd_session"
 
     protected_fields = ['user_id']
 
