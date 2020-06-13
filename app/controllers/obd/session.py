@@ -195,7 +195,12 @@ class SessionController(BaseUserController):
             items.append({
                 'id': session.id,
                 'date': session.date,
-                'points': [car_state.gps.get_point() for car_state in sorted_car_states]
+                'points': [
+                    car_state.gps.get_point()
+                    for car_state
+                    in sorted_car_states
+                    if not (car_state.gps.lat == 0 and car_state.gps.lng == 0)
+                ]
             })
 
         return items
