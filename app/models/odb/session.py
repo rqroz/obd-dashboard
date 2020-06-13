@@ -25,6 +25,13 @@ class ODBSession(DATABASE.Model, DictDataModel):
 
     car_states = relationship('CarState', uselist=True)
 
+    @classmethod
+    def create(cls, db_session, **kwargs):
+        instance = cls(**kwargs)
+        db_session.add(instance)
+        db_session.flush()
+        return instance
+
     def to_flat_data(self):
         """ Flattens the data for the current session states """
         return {

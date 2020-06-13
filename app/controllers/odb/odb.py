@@ -9,7 +9,7 @@ from io import StringIO
 from typing import List
 from structlog import get_logger
 
-from app.constants.odb import CSV_SENSOR_MAP
+from app.constants.odb import CarSensorID, CSV_SENSOR_MAP
 from app.controllers import BaseController
 from app.controllers.odb.session import SessionController
 from app.models.odb.car import CarState
@@ -83,19 +83,9 @@ class ODBController(BaseController):
         LOGGER.info(f'Request is attached to {user.first_name} {user.last_name}', user_id=user.id)
         session = SessionController(user_id=user.id).get_or_create(data['session'])
         LOGGER.info('Resolved session to proceed', **session.to_dict())
-        now = datetime.datetime.now()
 
-        sensor_values = []
-        for controller_class in self.SENSOR_CONTROLLER_CLASSES:
-            controller = controller_class(db_session=self.db_session)
-            sensor_values += [
-                val
-                for val
-                in controller.create_sensor_values_torque(session, data, now).values()
-                if val
-            ]
-
-        self.db_session.bulk_save_objects(sensor_values)
+        car_state = CarState.create_from_torque(self.db_session, session, data)
+        LOGGER.info('Created Car State', **car_state.to_dict())
         self.db_session.commit()
 
     def process_csv(self, user: User, csv_file):
@@ -107,6 +97,7 @@ class ODBController(BaseController):
             - user (app.models.user.User): User instance;
             - csv_file (werkzeug.FileStorage): A file representation of the CSV file created by TORQUE.
         """
+        self.db_session.rollback()
         csv = pandas.read_csv(StringIO(csv_file.read().decode('utf-8')))
         missing_cols = [col_name for col_name in CSV_SENSOR_MAP.values() if col_name not in csv.columns.values]
         if missing_cols:
@@ -119,9 +110,6 @@ class ODBController(BaseController):
         if self.db_session.query(ODBSession).filter(ODBSession.id == gen_session_id).first():
             return
 
-        session = ODBSession(id=gen_session_id, user_id=user.id, date=start_datetime)
-        self.db_session.add(session)
-        self.db_session.flush()
-
+        session = ODBSession.create(self.db_session, id=gen_session_id, user_id=user.id, date=start_datetime)
         _ = CarState.create_from_csv(self.db_session, session, csv)
         self.db_session.commit()

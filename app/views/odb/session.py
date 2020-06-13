@@ -22,6 +22,18 @@ class SessionViews:
             view_func=cls.session_get_view,
             methods=('GET',),
         )
+        server.add_url_rule(
+            '/api/sessions/summary/',
+            'session_summary_view',
+            view_func=cls.summary_view,
+            methods=('GET',),
+        )
+        server.add_url_rule(
+            '/api/sessions/locations/',
+            'session_locations_view',
+            view_func=cls.locations_view,
+            methods=('GET',),
+        )
 
     @auth_required
     def session_list_view(user):
@@ -39,25 +51,13 @@ class SessionViews:
             return response
 
         data = session.to_dict()
-        data['readings'] = {
-            'engine': {
-                'load': [load.to_dict() for load in session.engine_load_readings],
-                'rpm': [rpm.to_dict() for rpm in session.engine_rpm_readings],
-                'maf': [maf.to_dict() for maf in session.engine_maf_readings],
-                'map': [map.to_dict() for map in session.engine_map_readings],
-                'coolant_temperature': [
-                    coolant_temp.to_dict()
-                    for coolant_temp
-                    in session.engine_coolant_temp_readings
-                ],
-            },
-            'battery': [battery.to_dict() for battery in session.engine_voltage_readings],
-            'speed': [speed.to_dict() for speed in session.speed_readings],
-            'fuel': {
-                'level': [level.to_dict() for level in session.fuel_level_readings],
-                'ratio': [ratio.to_dict() for ratio in session.fuel_ratio_readings],
-                'lambda': [lbd.to_dict() for lbd in session.fuel_lambda_readings],
-            },
-            'gps': [gps.to_dict() for gps in session.gps_readings],
-        }
+        data['car_states'] = [state.to_dict() for state in session.car_states]
         return jsonify(data)
+
+    @auth_required
+    def summary_view(user):
+        return jsonify(SessionController(user_id=user.id).get_summary())
+
+    @auth_required
+    def locations_view(user):
+        return jsonify(SessionController(user_id=user.id).get_locations())

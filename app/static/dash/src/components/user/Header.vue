@@ -39,7 +39,7 @@
       <simple-card
         :icon="load.icon"
         :subtitle="load.subtitle"
-        :title="load.value ? `${load.average.toFixed(2)} %` : '-'"
+        :title="load.value ? `${load.value.toFixed(2)} %` : '-'"
       />
     </v-col>
   </v-row>
@@ -119,6 +119,26 @@ export default {
         }
       }
     },
+  },
+  methods: {
+    fetch() {
+      this.$requests.get('/sessions/summary/')
+        .then(response => {
+          const data = response.data;
+          this.thresholds.battery = data.battery.threshold;
+          this.battery.value = data.battery.latest;
+          this.fuel.value = data.fuel_level;
+          this.load.value = data.engine.load_avg;
+          this.rpm.value = data.engine.rpm_avg;
+          this.speed.value = data.speed_avg;
+        })
+        .catch((error) => {
+          console.log(error);
+        })
+    },
+  },
+  mounted() {
+    this.fetch();
   },
 };
 </script>

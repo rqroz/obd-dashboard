@@ -46,7 +46,7 @@ export default {
     HereMap,
   },
   data: () => ({
-    endpoint: '/gps/',
+    endpoint: '/sessions/locations/',
     trips: [],
     selected: null,
     zoom: 11,
@@ -72,7 +72,7 @@ export default {
   },
   methods: {
     successHandler(response) {
-      this.trips = response.data.trips || [];
+      this.trips = response.data || [];
       if (this.trips.length) {
         this.selected = this.trips[this.trips.length - 1];
       }

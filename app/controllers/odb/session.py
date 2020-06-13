@@ -5,7 +5,9 @@ from typing import List
 from sqlalchemy.orm import selectinload
 from sqlalchemy.sql import func
 
+from app.constants.odb import BatteryLevel
 from app.controllers import BaseUserController
+from app.models.odb.car import CarState, Engine
 from app.models.odb.session import ODBSession
 from app.models.user import User
 
@@ -139,3 +141,61 @@ class SessionController(BaseUserController):
             data.append(sesh)
 
         return data
+
+    def get_summary(self):
+        latest_state = (
+            self.db_session.query(CarState)
+                            .join(ODBSession, CarState.session_id == ODBSession.id)
+                            .filter(ODBSession.user_id == self.user_id)
+                            .order_by(CarState.id.desc())
+                            .first()
+        )
+        speed_average = (
+            self.db_session.query(func.avg(CarState.speed).label('speed_average'))
+                            .join(ODBSession, CarState.session_id == ODBSession.id)
+                            .filter(ODBSession.user_id == self.user_id)
+                            .scalar()
+        )
+        rpm_average, load_average = (
+            self.db_session.query(
+                                func.avg(Engine.rpm).label('rpm_average'),
+                                func.avg(Engine.load).label('load_average'),
+                            )
+                            .join(CarState, CarState.engine_id == Engine.id)
+                            .join(ODBSession, CarState.session_id == ODBSession.id)
+                            .filter(ODBSession.user_id == self.user_id)
+                            .first()
+        )
+
+        data = {
+            'fuel_level': float(latest_state.fuel.level) if latest_state else None,
+            'battery': {
+                'latest': float(latest_state.voltage) if latest_state else None,
+                'threshold': BatteryLevel.MIN,
+            },
+            'speed_avg': speed_average,
+            'engine': {
+                'load_avg': load_average,
+                'rpm_avg': rpm_average,
+            }
+        }
+        return data
+
+    def get_locations(self):
+        sessions = (
+            self.db_session.query(ODBSession)
+                            .filter(ODBSession.user_id == self.user_id)
+                            .order_by(ODBSession.date.asc())
+                            .options(selectinload('car_states'))
+        )
+
+        items = []
+        for session in sessions:
+            sorted_car_states = sorted(session.car_states, key=lambda state: state.timestamp)
+            items.append({
+                'id': session.id,
+                'date': session.date,
+                'points': [car_state.gps.get_point() for car_state in sorted_car_states]
+            })
+
+        return items

@@ -3,6 +3,8 @@ ODB Specific constants.
 """
 class CarSensorID:
     DATE = 'date'
+    TIMESTAMP = 'time'
+
     SPEED = 'kd'
     VOLTAGE = 'k42'
 

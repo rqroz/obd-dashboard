@@ -64,6 +64,7 @@ class CarState(DATABASE.Model, DictDataModel):
 
     speed = Column(Numeric, nullable=False)
     voltage = Column(Numeric, nullable=False)
+    timestamp = Column(String(25))
 
     date = Column(DateTime, default=datetime.datetime.utcnow)
 
@@ -91,6 +92,7 @@ class CarState(DATABASE.Model, DictDataModel):
             'speed': self.speed,
             'voltage': self.voltage,
             'date': self.date,
+            'timestamp': self.timestamp,
             'engine_coolant_temp': self.engine.coolant_temp,
             'engine_load': self.engine.load,
             'engine_maf': self.engine.maf,
@@ -142,40 +144,77 @@ class CarState(DATABASE.Model, DictDataModel):
                 db_session.flush()
 
                 date_str = row_value(row, CarSensorID.DATE)
+                date = datetime.datetime.strptime(date_str, '%d-%b-%Y %H:%M:%S.%f')
                 curr_state = cls(
                     engine_id=engine.id,
                     fuel_id=fuel.id,
                     gps_id=gps.id,
                     session_id=session.id,
-                    date=datetime.datetime.strptime(date_str, '%d-%b-%Y %H:%M:%S.%f'),
+                    date=date,
                     speed=row_value(row, CarSensorID.SPEED),
                     voltage=row_value(row, CarSensorID.VOLTAGE),
+                    timestamp=str(date.timestamp()).replace('.', '')[:13],
                 )
                 db_session.add(curr_state)
                 db_session.flush()
 
                 car_states.apppend(curr_state)
-            except:
+            except Exception as err:
+                LOGGER.error('TORQUE: Could not save car state', error=str(err))
                 continue
 
         return car_states
 
     @classmethod
-    def create_from_torque(cls, session: ODBSession, request_data: dict, date: datetime.datetime):
+    def create_from_torque(cls, db_session, session: ODBSession, data: dict):
         """
         Creates an instance from TORQUE's request data.
 
         Args:
             - session (app.models.odb.session.ODBSession): Current session to attach instance to;
-            - request_data (dict): Request data from TORQUE.
+            - data (dict): Request data from TORQUE.
             - date (datetime.datetime): Date to attach to instance.
 
         Returns:
             - (cls | None): An instance of <cls>, if able to resolve sensor data from the request. Otherwise, None.
         """
-        if cls.SENSOR_KEY not in request_data:
+        try:
+            gps = GPSReading(
+                lat=data[CarSensorID.GPS.LATITUDE],
+                lng=data[CarSensorID.GPS.LONGITUDE],
+            )
+            db_session.add(gps)
+
+            fuel = Fuel(
+                level=data[CarSensorID.Fuel.LEVEL],
+                ratio=data[CarSensorID.Fuel.RATIO],
+                cmd_equivalence_ratio=data[CarSensorID.Fuel.LAMBDA],
+            )
+            db_session.add(fuel)
+
+            engine = Engine(
+                coolant_temp=data[CarSensorID.Engine.COOLANT_TEMP],
+                load=data[CarSensorID.Engine.LOAD],
+                maf=data[CarSensorID.Engine.MAF],
+                map=data[CarSensorID.Engine.MAP],
+                rpm=data[CarSensorID.Engine.RPM],
+            )
+            db_session.add(engine)
+            db_session.flush()
+
+            car_state = cls(
+                engine_id=engine.id,
+                fuel_id=fuel.id,
+                gps_id=gps.id,
+                session_id=session.id,
+                speed=data[CarSensorID.SPEED],
+                voltage=data[CarSensorID.VOLTAGE],
+                timestamp=data[CarSensorID.TIMESTAMP],
+            )
+            db_session.add(car_state)
+            db_session.flush()
+        except Exception as err:
+            LOGGER.error('TORQUE: Could not save car state', error=str(err))
             return None
-        else:
-            value = request_data[cls.SENSOR_KEY]
-            LOGGER.info(f'Will create instance of {cls.__name__}', value=value)
-            return cls(session_id=session.id, value=value, date=date)
+
+        return car_state
