@@ -197,11 +197,10 @@ class CarState(DATABASE.Model, DictDataModel):
                 )
                 db_session.add(curr_state)
                 db_session.flush()
-
-                car_states.apppend(curr_state)
             except Exception as err:
                 LOGGER.error('TORQUE: Could not save car state', error=str(err))
-                continue
+            else:
+                car_states.apppend(curr_state)
 
         return car_states
 
@@ -220,34 +219,34 @@ class CarState(DATABASE.Model, DictDataModel):
         """
         try:
             acceletometer = Acceletometer(
-                total=data[CarSensorID.Accelerometer.TOTAL],
-                x=data[CarSensorID.Accelerometer.X],
-                y=data[CarSensorID.Accelerometer.Y],
-                z=data[CarSensorID.Accelerometer.Z],
+                total=data.get(CarSensorID.Accelerometer.TOTAL, 0),
+                x=data.get(CarSensorID.Accelerometer.X, 0),
+                y=data.get(CarSensorID.Accelerometer.Y, 0),
+                z=data.get(CarSensorID.Accelerometer.Z, 0),
             )
             db_session.add(acceletometer)
 
             fuel = Fuel(
-                cmd_equivalence_ratio=data[CarSensorID.Fuel.LAMBDA],
-                level=data[CarSensorID.Fuel.LEVEL],
-                ratio=data[CarSensorID.Fuel.RATIO],
-                used=data[CarSensorID.Fuel.USED],
+                cmd_equivalence_ratio=data.get(CarSensorID.Fuel.LAMBDA, 0),
+                level=data.get(CarSensorID.Fuel.LEVEL, 0),
+                ratio=data.get(CarSensorID.Fuel.RATIO, 0),
+                used=data.get(CarSensorID.Fuel.USED, 0),
             )
             db_session.add(fuel)
 
             engine = Engine(
-                coolant_temp=data[CarSensorID.Engine.COOLANT_TEMP],
-                load=data[CarSensorID.Engine.LOAD],
-                intake_air_temp=data[CarSensorID.Engine.INTAKE_AIR_TEMP],
-                maf=data[CarSensorID.Engine.MAF],
-                map=data[CarSensorID.Engine.MAP],
-                rpm=data[CarSensorID.Engine.RPM],
+                coolant_temp=data.get(CarSensorID.Engine.COOLANT_TEMP, 0),
+                load=data.get(CarSensorID.Engine.LOAD, 0),
+                intake_air_temp=data.get(CarSensorID.Engine.INTAKE_AIR_TEMP, 0),
+                maf=data.get(CarSensorID.Engine.MAF, 0),
+                map=data.get(CarSensorID.Engine.MAP, 0),
+                rpm=data.get(CarSensorID.Engine.RPM, 0),
             )
             db_session.add(engine)
 
             gps = GPSReading(
-                lat=data[CarSensorID.GPS.LATITUDE],
-                lng=data[CarSensorID.GPS.LONGITUDE],
+                lat=data.get(CarSensorID.GPS.LATITUDE, 0),
+                lng=data.get(CarSensorID.GPS.LONGITUDE, 0),
             )
             db_session.add(gps)
 
@@ -259,9 +258,9 @@ class CarState(DATABASE.Model, DictDataModel):
                 fuel_id=fuel.id,
                 gps_id=gps.id,
                 session_id=session.id,
-                speed=data[CarSensorID.SPEED],
-                voltage=data[CarSensorID.VOLTAGE],
-                throttle_position = data[CarSensorID.THROTTLE_POSITION],
+                speed=data.get(CarSensorID.SPEED, 0),
+                voltage=data.get(CarSensorID.VOLTAGE, 0),
+                throttle_position = data.get(CarSensorID.THROTTLE_POSITION, 0),
                 timestamp=data[CarSensorID.TIMESTAMP],
             )
             db_session.add(car_state)

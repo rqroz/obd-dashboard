@@ -82,8 +82,9 @@ class OBDController(BaseController):
         LOGGER.info('Resolved session to proceed', **session.to_dict())
 
         car_state = CarState.create_from_torque(self.db_session, session, data)
-        LOGGER.info('Created Car State', **car_state.to_dict())
-        self.db_session.commit()
+        if car_state:
+            LOGGER.info('Created Car State', **car_state.to_dict())
+            self.db_session.commit()
 
     def process_csv(self, user: User, csv_file):
         """
