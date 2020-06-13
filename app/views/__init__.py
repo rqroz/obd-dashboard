@@ -9,8 +9,8 @@ from app.views import (
     health,
     user,
 )
-from app.views.odb import (
-    odb,
+from app.views.obd import (
+    obd,
     session,
 )
 
@@ -22,6 +22,6 @@ def add_views(app: Flask):
     index.IndexViews.add_views(app)
     user.UserViews.add_views(app)
 
-    # ODB
-    odb.ODBViews.add_views(app)
+    # OBD
+    obd.OBDViews.add_views(app)
     session.SessionViews.add_views(app)

@@ -4,7 +4,7 @@ Utility module for common functions/logic.
 import dash_html_components as html
 
 from app.database import DATABASE
-from app.controllers.odb.session import SessionController
+from app.controllers.obd.session import SessionController
 from app.utils.auth import AuthHandler
 
 from app.plotly_dash.constants import Colors
@@ -41,7 +41,7 @@ def get_session_controller(user=None):
         - user (app.models.user.User): User instance.
 
     Returns:
-        - (app.controllers.odb.session.SessionController): Instance of the SessionController.
+        - (app.controllers.obd.session.SessionController): Instance of the SessionController.
     """
     if not user:
         user = AuthHandler.handle_auth_request()

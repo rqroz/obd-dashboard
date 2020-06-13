@@ -1,41 +1,41 @@
 """
-ODB Views.
+OBD Views.
 """
 from structlog import get_logger
 from flask import request, jsonify
 
-from app.controllers.odb.odb import ODBController, ODBControllerError
+from app.controllers.obd.obd import OBDController, OBDControllerError
 from app.decorators import auth_required
 
 
 LOGGER = get_logger(__name__)
 
 
-class ODBViews:
+class OBDViews:
     @classmethod
     def add_views(cls, server):
-        server.add_url_rule('/odb', 'odb_torque_view', view_func=cls.odb_torque_view, methods=('GET',))
+        server.add_url_rule('/obd', 'obd_torque_view', view_func=cls.obd_torque_view, methods=('GET',))
         server.add_url_rule(
-            '/api/odb/upload/',
-            'odb_csv_upload',
-            view_func=cls.odb_csv_upload,
+            '/api/obd/upload/',
+            'obd_csv_upload',
+            view_func=cls.obd_csv_upload,
             methods=('POST',)
         )
 
-    def odb_torque_view():
+    def obd_torque_view():
         """
         Receives TORQUE request and process the data accordingly.
         """
-        controller = ODBController()
+        controller = OBDController()
         try:
             controller.process_sensor_params(request.args)
-        except ODBControllerError as err:
+        except OBDControllerError as err:
             LOGGER.error(str(err))
 
         return 'OK!'
 
     @auth_required
-    def odb_csv_upload(user):
+    def obd_csv_upload(user):
         """ Registers sensor information through a CSV file sent by the client """
         try:
             csv_file = request.files['file']
@@ -44,10 +44,10 @@ class ODBViews:
             response.status_code = 400
             return response
 
-        controller = ODBController()
+        controller = OBDController()
         try:
             controller.process_csv(user, csv_file)
-        except ODBControllerError as err:
+        except OBDControllerError as err:
             message = str(err)
             LOGGER.error('Unable to process CSV file', error=message)
             response = jsonify({'message': message})

@@ -3,7 +3,7 @@ Session Views.
 """
 from flask import jsonify
 
-from app.controllers.odb.session import SessionController
+from app.controllers.obd.session import SessionController
 from app.decorators import auth_required
 
 

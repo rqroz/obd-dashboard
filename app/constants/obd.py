@@ -1,5 +1,5 @@
 """
-ODB Specific constants.
+OBD Specific constants.
 """
 class CarSensorID:
     DATE = 'date'
@@ -27,6 +27,7 @@ class CarSensorID:
         LAMBDA = 'k44'
         LEVEL = 'k2f'
         RATIO = 'kff1203'
+        USED = 'kff1271'
 
     class GPS:
         LATITUDE = 'kff1006'
@@ -54,6 +55,7 @@ CSV_SENSOR_MAP = {
     CarSensorID.Fuel.LEVEL: 'Fuel Level (From Engine ECU)(%)',
     CarSensorID.Fuel.RATIO: 'Kilometers Per Litre(Instant)(kpl)',
     CarSensorID.Fuel.LAMBDA: 'Commanded Equivalence Ratio(lambda)',
+    CarSensorID.Fuel.USED: 'Fuel used (trip)(l)',
 
     CarSensorID.GPS.LATITUDE: ' Latitude',
     CarSensorID.GPS.LONGITUDE: ' Longitude',

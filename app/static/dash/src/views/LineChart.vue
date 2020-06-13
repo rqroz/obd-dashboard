@@ -9,7 +9,7 @@
 </template>
 
 <script>
-import LineChart from '@/components/odb/graphs/Line';
+import LineChart from '@/components/obd/graphs/Line';
 
 export default {
   name: 'LineChartView',

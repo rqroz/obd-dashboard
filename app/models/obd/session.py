@@ -1,5 +1,5 @@
 """
-ODB Session.
+OBD Session.
 """
 import datetime
 
@@ -11,8 +11,8 @@ from app.models import DictDataModel
 from app.models.user import User
 
 
-class ODBSession(DATABASE.Model, DictDataModel):
-    """ Readings for GPS data from ODB sensors. """
+class OBDSession(DATABASE.Model, DictDataModel):
+    """ Readings for GPS data from OBD sensors. """
     __tablename__ = "obd_session"
 
     protected_fields = ['user_id']

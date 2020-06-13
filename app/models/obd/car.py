@@ -9,10 +9,10 @@ from structlog import get_logger
 from sqlalchemy import Column, ForeignKey, Integer, String, Numeric, DateTime
 from sqlalchemy.orm import relationship
 
-from app.constants.odb import CSV_SENSOR_MAP, CarSensorID
+from app.constants.obd import CSV_SENSOR_MAP, CarSensorID
 from app.database import DATABASE
 from app.models import DictDataModel
-from app.models.odb.session import ODBSession
+from app.models.obd.session import OBDSession
 
 
 LOGGER = get_logger(__name__)
@@ -47,13 +47,14 @@ class Fuel(DATABASE.Model, DictDataModel):
     __tablename__ = 'fuel_state'
 
     id = Column(Integer, primary_key=True)
+    cmd_equivalence_ratio = Column(Numeric, nullable=False)
     level = Column(Numeric, nullable=False)
     ratio = Column(Numeric, nullable=False)
-    cmd_equivalence_ratio = Column(Numeric, nullable=False)
+    used = Column(Numeric, nullable=False)
 
 
 class GPSReading(DATABASE.Model, DictDataModel):
-    """ Readings for GPS data from ODB sensors. """
+    """ Readings for GPS data from OBD sensors. """
     __tablename__ = 'gps_location'
 
     id = Column(Integer, primary_key=True)
@@ -69,7 +70,7 @@ class CarState(DATABASE.Model, DictDataModel):
     __tablename__ = 'car_state'
 
     id = Column(Integer, primary_key=True)
-    session_id = Column(String, ForeignKey(ODBSession.id))
+    session_id = Column(String, ForeignKey(OBDSession.id))
     acceletometer_id = Column(Integer, ForeignKey(Acceletometer.id))
     engine_id = Column(Integer, ForeignKey(Engine.id))
     fuel_id = Column(Integer, ForeignKey(Fuel.id))
@@ -86,7 +87,7 @@ class CarState(DATABASE.Model, DictDataModel):
     engine = relationship(Engine, uselist=False)
     fuel = relationship(Fuel, uselist=False)
     gps = relationship(GPSReading, uselist=False)
-    session = relationship(ODBSession, uselist=False)
+    session = relationship(OBDSession, uselist=False)
 
     def to_dict(self, include_protected=False):
         data = super(CarState, self).to_dict(include_protected)
@@ -121,18 +122,19 @@ class CarState(DATABASE.Model, DictDataModel):
             'engine_maf': self.engine.maf,
             'engine_map': self.engine.map,
             'engine_rpm': self.engine.rpm,
+            'fuel_cmd_equivalence_ratio': self.fuel.cmd_equivalence_ratio,
             'fuel_level': self.fuel.level,
             'fuel_ratio': self.fuel.ratio,
-            'fuel_cmd_equivalence_ratio': self.fuel.cmd_equivalence_ratio,
+            'fuel_used': self.fuel.used,
         }
 
     @classmethod
-    def create_from_csv(cls, db_session, session: ODBSession, csv: DataFrame):
+    def create_from_csv(cls, db_session, session: OBDSession, csv: DataFrame):
         """
         Creates a list of instances from a TORQUE generated CSV.
 
         Args:
-            - session (app.models.odb.session.ODBSession): Current session to attach instance to;
+            - session (app.models.obd.session.OBDSession): Current session to attach instance to;
             - csv (pandas.DataFrame): DataFrame representation of TORQUE generated CSV.
 
         Returns:
@@ -154,9 +156,10 @@ class CarState(DATABASE.Model, DictDataModel):
                 db_session.add(acceletometer)
 
                 fuel = Fuel(
+                    cmd_equivalence_ratio=row_value(row, CarSensorID.Fuel.LAMBDA),
                     level=row_value(row, CarSensorID.Fuel.LEVEL),
                     ratio=row_value(row, CarSensorID.Fuel.RATIO),
-                    cmd_equivalence_ratio=row_value(row, CarSensorID.Fuel.LAMBDA),
+                    used=row_value(row, CarSensorID.Fuel.USED),
                 )
                 db_session.add(fuel)
 
@@ -203,12 +206,12 @@ class CarState(DATABASE.Model, DictDataModel):
         return car_states
 
     @classmethod
-    def create_from_torque(cls, db_session, session: ODBSession, data: dict):
+    def create_from_torque(cls, db_session, session: OBDSession, data: dict):
         """
         Creates an instance from TORQUE's request data.
 
         Args:
-            - session (app.models.odb.session.ODBSession): Current session to attach instance to;
+            - session (app.models.obd.session.OBDSession): Current session to attach instance to;
             - data (dict): Request data from TORQUE.
             - date (datetime.datetime): Date to attach to instance.
 
@@ -225,9 +228,10 @@ class CarState(DATABASE.Model, DictDataModel):
             db_session.add(acceletometer)
 
             fuel = Fuel(
+                cmd_equivalence_ratio=data[CarSensorID.Fuel.LAMBDA],
                 level=data[CarSensorID.Fuel.LEVEL],
                 ratio=data[CarSensorID.Fuel.RATIO],
-                cmd_equivalence_ratio=data[CarSensorID.Fuel.LAMBDA],
+                used=data[CarSensorID.Fuel.USED],
             )
             db_session.add(fuel)
 

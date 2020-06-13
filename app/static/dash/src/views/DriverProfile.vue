@@ -9,7 +9,7 @@
 </template>
 
 <script>
-import ProfileChart from '@/components/odb/graphs/Profile';
+import ProfileChart from '@/components/obd/graphs/Profile';
 
 export default {
   name: 'DriverProfileView',

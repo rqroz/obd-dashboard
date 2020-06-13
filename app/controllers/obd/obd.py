@@ -1,5 +1,5 @@
 """
-ODB Controller
+OBD Controller
 """
 import datetime
 import pandas
@@ -9,28 +9,25 @@ from io import StringIO
 from typing import List
 from structlog import get_logger
 
-from app.constants.odb import CarSensorID, CSV_SENSOR_MAP
+from app.constants.obd import CarSensorID, CSV_SENSOR_MAP
 from app.controllers import BaseController
-from app.controllers.odb.session import SessionController
-from app.models.odb.car import CarState
-from app.models.odb.session import ODBSession
+from app.controllers.obd.session import SessionController
+from app.models.obd.car import CarState
+from app.models.obd.session import OBDSession
 from app.models.user import User
 
 
 LOGGER = get_logger(__name__)
 
 
-class ODBControllerError(Exception):
-    """ Exception class for ODB Controller """
+class OBDControllerError(Exception):
+    """ Exception class for OBD Controller """
     pass
 
 
-class ODBController(BaseController):
+class OBDController(BaseController):
     """
-    Controller class for ODB-related data manipulations.
-
-    Attributes:
-        - SENSOR_CONTROLLER_CLASSES (List[BaseODBController]): List of sensor controllers used.
+    Controller class for OBD-related data manipulations.
     """
     SENSOR_CONTROLLER_CLASSES = []
 
@@ -44,7 +41,7 @@ class ODBController(BaseController):
         Resolves user from data.
 
         Raises:
-            - ODBControllerError:
+            - OBDControllerError:
                 If user email is not found in <data>;
                 If there is no user corresponding to the email found in <data>;
 
@@ -56,11 +53,11 @@ class ODBController(BaseController):
         """
         user_email = data.get('eml')
         if not user_email:
-            raise ODBControllerError('User email not found')
+            raise OBDControllerError('User email not found')
 
         user: User = self.db_session.query(User).filter(User.email == user_email).first()
         if not user:
-            raise ODBControllerError('User does not exist')
+            raise OBDControllerError('User does not exist')
 
         return user
 
@@ -68,7 +65,7 @@ class ODBController(BaseController):
         """
         Process data receive from TORQUE.
         If identifies that the data is composed by keys identifying sensor specs, will register such specs in the DB.
-        Sensors currently considered are described in <app.constants.odb.CarSensorID>.
+        Sensors currently considered are described in <app.constants.obd.CarSensorID>.
 
         Args:
             - data (dict): Data to be processed.
@@ -101,15 +98,15 @@ class ODBController(BaseController):
         csv = pandas.read_csv(StringIO(csv_file.read().decode('utf-8')))
         missing_cols = [col_name for col_name in CSV_SENSOR_MAP.values() if col_name not in csv.columns.values]
         if missing_cols:
-            raise ODBControllerError(f'CSV is missing the following columns: {", ".join(missing_cols)}')
+            raise OBDControllerError(f'CSV is missing the following columns: {", ".join(missing_cols)}')
 
         csv = csv[CSV_SENSOR_MAP.values()]
         start_datetime = self._resolve_date_from_csv_row(csv.iloc[0])
         gen_session_id = str(start_datetime.timestamp()).replace('.', '')[:12]
 
-        if self.db_session.query(ODBSession).filter(ODBSession.id == gen_session_id).first():
+        if self.db_session.query(OBDSession).filter(OBDSession.id == gen_session_id).first():
             return
 
-        session = ODBSession.create(self.db_session, id=gen_session_id, user_id=user.id, date=start_datetime)
+        session = OBDSession.create(self.db_session, id=gen_session_id, user_id=user.id, date=start_datetime)
         _ = CarState.create_from_csv(self.db_session, session, csv)
         self.db_session.commit()

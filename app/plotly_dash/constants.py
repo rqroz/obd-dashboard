@@ -17,6 +17,7 @@ CHART_TYPES = [
     {'label': 'Engine Coolant Temperature (°C)', 'value': 'engine_coolant_temp'},
     {'label': 'Fuel Level (%)', 'value': 'fuel_level'},
     {'label': 'Fuel Ratio (Km/L)', 'value': 'fuel_ratio'},
+    {'label': 'Fuel Used (L)', 'value': 'fuel_used'},
     {'label': 'Intake Air Temperature (°C)', 'value': 'engine_intake_air_temp'},
     {'label': 'Manifold Pressure (kPa)', 'value': 'engine_map'},
     {'label': 'Mass Air Flow Rate (g/s)', 'value': 'engine_maf'},
