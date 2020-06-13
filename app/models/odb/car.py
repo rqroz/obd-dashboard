@@ -36,6 +36,7 @@ class Engine(DATABASE.Model, DictDataModel):
     id = Column(Integer, primary_key=True)
     coolant_temp = Column(Numeric, nullable=False)
     load = Column(Numeric, nullable=False)
+    intake_air_temp = Column(Numeric, nullable=False)
     maf = Column(Numeric, nullable=False)
     map = Column(Numeric, nullable=False)
     rpm = Column(Numeric, nullable=False)
@@ -77,7 +78,7 @@ class CarState(DATABASE.Model, DictDataModel):
     speed = Column(Numeric, nullable=False)
     voltage = Column(Numeric, nullable=False)
     throttle_position = Column(Numeric, nullable=False)
-    timestamp = Column(String(25))
+    timestamp = Column(String(25), nullable=False)
 
     date = Column(DateTime, default=datetime.datetime.utcnow)
 
@@ -116,6 +117,7 @@ class CarState(DATABASE.Model, DictDataModel):
             'acceletometer_z': self.acceletometer.z,
             'engine_coolant_temp': self.engine.coolant_temp,
             'engine_load': self.engine.load,
+            'engine_intake_air_temp': self.engine.intake_air_temp,
             'engine_maf': self.engine.maf,
             'engine_map': self.engine.map,
             'engine_rpm': self.engine.rpm,
@@ -136,7 +138,10 @@ class CarState(DATABASE.Model, DictDataModel):
         Returns:
             - (List[cls]): List of created instances.
         """
-        row_value = lambda row, key: row[CSV_SENSOR_MAP[key]]
+        def row_value(row, key):
+            value = row[CSV_SENSOR_MAP[key]]
+            return value if value != '-' else 0
+
         car_states = []
         for _, row in csv.iterrows():
             try:
@@ -148,12 +153,6 @@ class CarState(DATABASE.Model, DictDataModel):
                 )
                 db_session.add(acceletometer)
 
-                gps = GPSReading(
-                    lat=row_value(row, CarSensorID.GPS.LATITUDE),
-                    lng=row_value(row, CarSensorID.GPS.LONGITUDE),
-                )
-                db_session.add(gps)
-
                 fuel = Fuel(
                     level=row_value(row, CarSensorID.Fuel.LEVEL),
                     ratio=row_value(row, CarSensorID.Fuel.RATIO),
@@ -164,11 +163,18 @@ class CarState(DATABASE.Model, DictDataModel):
                 engine = Engine(
                     coolant_temp=row_value(row, CarSensorID.Engine.COOLANT_TEMP),
                     load=row_value(row, CarSensorID.Engine.LOAD),
+                    intake_air_temp=row_value(row, CarSensorID.Engine.INTAKE_AIR_TEMP),
                     maf=row_value(row, CarSensorID.Engine.MAF),
                     map=row_value(row, CarSensorID.Engine.MAP),
                     rpm=row_value(row, CarSensorID.Engine.RPM),
                 )
                 db_session.add(engine)
+
+                gps = GPSReading(
+                    lat=row_value(row, CarSensorID.GPS.LATITUDE),
+                    lng=row_value(row, CarSensorID.GPS.LONGITUDE),
+                )
+                db_session.add(gps)
 
                 db_session.flush()
 
@@ -210,11 +216,13 @@ class CarState(DATABASE.Model, DictDataModel):
             - (cls | None): An instance of <cls>, if able to resolve sensor data from the request. Otherwise, None.
         """
         try:
-            gps = GPSReading(
-                lat=data[CarSensorID.GPS.LATITUDE],
-                lng=data[CarSensorID.GPS.LONGITUDE],
+            acceletometer = Acceletometer(
+                total=data[CarSensorID.Accelerometer.TOTAL],
+                x=data[CarSensorID.Accelerometer.X],
+                y=data[CarSensorID.Accelerometer.Y],
+                z=data[CarSensorID.Accelerometer.Z],
             )
-            db_session.add(gps)
+            db_session.add(acceletometer)
 
             fuel = Fuel(
                 level=data[CarSensorID.Fuel.LEVEL],
@@ -226,20 +234,30 @@ class CarState(DATABASE.Model, DictDataModel):
             engine = Engine(
                 coolant_temp=data[CarSensorID.Engine.COOLANT_TEMP],
                 load=data[CarSensorID.Engine.LOAD],
+                intake_air_temp=data[CarSensorID.Engine.INTAKE_AIR_TEMP],
                 maf=data[CarSensorID.Engine.MAF],
                 map=data[CarSensorID.Engine.MAP],
                 rpm=data[CarSensorID.Engine.RPM],
             )
             db_session.add(engine)
+
+            gps = GPSReading(
+                lat=data[CarSensorID.GPS.LATITUDE],
+                lng=data[CarSensorID.GPS.LONGITUDE],
+            )
+            db_session.add(gps)
+
             db_session.flush()
 
             car_state = cls(
+                acceletometer_id=acceletometer.id,
                 engine_id=engine.id,
                 fuel_id=fuel.id,
                 gps_id=gps.id,
                 session_id=session.id,
                 speed=data[CarSensorID.SPEED],
                 voltage=data[CarSensorID.VOLTAGE],
+                throttle_position = data[CarSensorID.THROTTLE_POSITION],
                 timestamp=data[CarSensorID.TIMESTAMP],
             )
             db_session.add(car_state)

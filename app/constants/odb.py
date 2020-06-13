@@ -15,21 +15,22 @@ class CarSensorID:
         Y = 'kff1221'
         Z = 'kff1222'
 
-    class GPS:
-        LATITUDE = 'kff1006'
-        LONGITUDE = 'kff1005'
+    class Engine:
+        COOLANT_TEMP = 'k5'
+        LOAD = 'k43'
+        INTAKE_AIR_TEMP = 'kf'
+        MAF = 'k10'
+        MAP = 'kb'
+        RPM = 'kc'
 
     class Fuel:
         LAMBDA = 'k44'
         LEVEL = 'k2f'
         RATIO = 'kff1203'
 
-    class Engine:
-        COOLANT_TEMP = 'k5'
-        LOAD = 'k43'
-        MAF = 'k10'
-        MAP = 'kb'
-        RPM = 'kc'
+    class GPS:
+        LATITUDE = 'kff1006'
+        LONGITUDE = 'kff1005'
 
 
 CSV_SENSOR_MAP = {
@@ -43,11 +44,9 @@ CSV_SENSOR_MAP = {
     CarSensorID.Accelerometer.Y: 'Acceleration Sensor(Y axis)(g)',
     CarSensorID.Accelerometer.Z: 'Acceleration Sensor(Z axis)(g)',
 
-    CarSensorID.GPS.LATITUDE: ' Latitude',
-    CarSensorID.GPS.LONGITUDE: ' Longitude',
-
     CarSensorID.Engine.COOLANT_TEMP: 'Engine Coolant Temperature',
     CarSensorID.Engine.LOAD: 'Engine Load(Absolute)(%)',
+    CarSensorID.Engine.INTAKE_AIR_TEMP: 'Intake Air Temperature',
     CarSensorID.Engine.MAF: 'Mass Air Flow Rate(g/s)',
     CarSensorID.Engine.MAP: 'Intake Manifold Pressure(psi)',
     CarSensorID.Engine.RPM: 'Engine RPM(rpm)',
@@ -55,6 +54,9 @@ CSV_SENSOR_MAP = {
     CarSensorID.Fuel.LEVEL: 'Fuel Level (From Engine ECU)(%)',
     CarSensorID.Fuel.RATIO: 'Kilometers Per Litre(Instant)(kpl)',
     CarSensorID.Fuel.LAMBDA: 'Commanded Equivalence Ratio(lambda)',
+
+    CarSensorID.GPS.LATITUDE: ' Latitude',
+    CarSensorID.GPS.LONGITUDE: ' Longitude',
 }
 
 
