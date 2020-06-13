@@ -9,7 +9,7 @@
         :subtitle="fuel.subtitle"
         :message="fuel.message"
         :icon-color="fuel.iconColor"
-        :title="fuel.level ? `${fuel.level.toFixed(2)} %` : '-'"
+        :title="fuel.value ? `${fuel.value.toFixed(2)} %` : '-'"
       />
     </v-col>
     <v-col>
