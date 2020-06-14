@@ -17,7 +17,7 @@ class SessionViews:
             methods=('GET',),
         )
         server.add_url_rule(
-            '/api/sessions/<int:session_id>/',
+            '/api/sessions/<string:session_id>/',
             'session_get_view',
             view_func=cls.session_get_view,
             methods=('GET',),
