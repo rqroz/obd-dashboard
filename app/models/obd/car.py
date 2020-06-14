@@ -200,7 +200,7 @@ class CarState(DATABASE.Model, DictDataModel):
             except Exception as err:
                 LOGGER.error('TORQUE: Could not save car state', error=str(err))
             else:
-                car_states.apppend(curr_state)
+                car_states.append(curr_state)
 
         return car_states
 

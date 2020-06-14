@@ -32,7 +32,7 @@ class SessionController(BaseUserController):
             else [OBDSession]
         )
 
-    def get(self, id: int, fields: List[str] = None):
+    def get(self, id: str, fields: List[str] = None):
         """
         Returns an OBDSession instance based on its id and the current user.
 
