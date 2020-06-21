@@ -23,6 +23,12 @@ class SessionViews:
             methods=('GET',),
         )
         server.add_url_rule(
+            '/api/sessions/<string:session_id>/profile/',
+            'session_get_profile_view',
+            view_func=cls.session_get_profile_view,
+            methods=('GET',),
+        )
+        server.add_url_rule(
             '/api/sessions/summary/',
             'session_summary_view',
             view_func=cls.summary_view,
@@ -53,6 +59,17 @@ class SessionViews:
         data = session.to_dict()
         data['car_states'] = [state.to_dict() for state in session.car_states]
         return jsonify(data)
+
+    @auth_required
+    def session_get_profile_view(user, session_id):
+        """ Retrieves complete data package on a certain session for the current user """
+        session = SessionController(user_id=user.id).get(session_id)
+        if not session:
+            response = jsonify({'message': 'Unable to find session'})
+            response.status_code = 404
+            return response
+
+        return jsonify(session.get_profile())
 
     @auth_required
     def summary_view(user):

@@ -1,15 +1,13 @@
 <template>
-  <v-container justify="center">
-    <v-row>
-      <v-col>
-        <profile-chart />
-      </v-col>
-    </v-row>
-  </v-container>
+  <v-row>
+    <v-col>
+      <profile-chart />
+    </v-col>
+  </v-row>
 </template>
 
 <script>
-import ProfileChart from '@/components/obd/graphs/Profile';
+import ProfileChart from '@/components/obd/graphs/profile/Profile';
 
 export default {
   name: 'DriverProfileView',
