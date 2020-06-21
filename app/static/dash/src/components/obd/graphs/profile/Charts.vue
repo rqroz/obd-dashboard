@@ -94,7 +94,7 @@ export default {
         labels: Object.values(this.labelsMap),
         datasets: [{
           label: 'Driving Profile - Visual Representation',
-          backgroundColor: this.currentTheme.primary,
+          backgroundColor: 'rgba(33, 150, 243, 0.5)',
           data: this.values.radar.length === 0 ?
             [] :
             Object.keys(this.labelsMap).map(key => this.values.radar[this.slider.value][key]),
@@ -106,7 +106,7 @@ export default {
         labels: this.values.line.map(line => this.$options.filters.datetime(line.date)),
         datasets: [{
           label: 'Driving Profile - Metric',
-          borderColor: this.currentTheme.info,
+          borderColor: 'rgba(33, 150, 243, 0.75)',
           data: this.values.line.map(line => line.value),
           fill: false,
           showLine: true,
