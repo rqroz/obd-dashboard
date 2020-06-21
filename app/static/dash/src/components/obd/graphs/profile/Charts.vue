@@ -1,13 +1,10 @@
 <style lang="scss" scoped>
-.chart-area {
+.chart-container {
   margin: 0 auto;
+  max-width: 500px;
 
-  .chart-container {
-    max-width: 500px;
-
-    .chart {
-      padding: 30px;
-    }
+  .chart {
+    padding: 30px;
   }
 }
 </style>
@@ -19,31 +16,36 @@
     :dark="!$vuetify.theme.isDark"
   >
     <v-card-text>
-      <v-slider
-        class="ma-5 pt-4"
-        thumb-label="always"
-        v-model="slider.value"
-        :thumb-size="36"
-        :max="slider.max"
-        :light="$vuetify.theme.isDark"
-        :dark="!$vuetify.theme.isDark"
-        :disabled="!ready"
-      >
-        <template v-slot:thumb-label>
-          <v-icon :color="$vuetify.theme.isDark ? 'white' : 'black'">mdi-car-hatchback</v-icon>
-        </template>
-      </v-slider>
-
-      <div class="chart-area d-flex">
-        <v-spacer />
-        <div class="chart-container mr-5">
-          <radar-chart class="chart" :chart-data="radarChart" />
-        </div>
-        <div class="chart-container ml-5">
-          <line-chart class="chart" :chart-data="lineChart" />
-        </div>
-        <v-spacer />
-      </div>
+      <v-row>
+        <v-col>
+          <v-slider
+            class="mx-5 mt-5 pt-4"
+            thumb-label="always"
+            v-model="slider.value"
+            :thumb-size="36"
+            :max="slider.max"
+            :light="$vuetify.theme.isDark"
+            :dark="!$vuetify.theme.isDark"
+            :disabled="!ready"
+          >
+            <template v-slot:thumb-label>
+              <v-icon :color="$vuetify.theme.isDark ? 'white' : 'black'">mdi-car-hatchback</v-icon>
+            </template>
+          </v-slider>
+        </v-col>
+      </v-row>
+      <v-row>
+        <v-col>
+          <div class="chart-container">
+            <radar-chart class="chart" :chart-data="radarChart" />
+          </div>
+        </v-col>
+        <v-col>
+          <div class="chart-container">
+            <line-chart class="chart" :chart-data="lineChart" />
+          </div>
+        </v-col>
+      </v-row>
     </v-card-text>
   </v-card>
 </template>
