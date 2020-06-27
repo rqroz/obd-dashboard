@@ -89,25 +89,37 @@ export default {
     currentTheme() {
       return this.$vuetify.theme.themes[this.$vuetify.theme.isDark ? 'dark' : 'light'];
     },
-    radarChart() {
+    radarData() {
       return {
         labels: Object.values(this.labelsMap),
+        values: this.values.radar.length === 0 ?
+          [] :
+          Object.keys(this.labelsMap).map(key => this.values.radar[this.slider.value][key])
+      };
+    },
+    radarChart() {
+      return {
+        labels: this.radarData.labels,
         datasets: [{
           label: 'Driving Profile - Visual Representation',
           backgroundColor: 'rgba(33, 150, 243, 0.5)',
-          data: this.values.radar.length === 0 ?
-            [] :
-            Object.keys(this.labelsMap).map(key => this.values.radar[this.slider.value][key]),
+          data: this.radarData.values,
         }],
+      };
+    },
+    lineData() {
+      return {
+        labels: this.values.line.map(line => this.$options.filters.datetime(line.date)),
+        values: this.values.line.map(line => line.value),
       };
     },
     lineChart() {
       return {
-        labels: this.values.line.map(line => this.$options.filters.datetime(line.date)),
+        labels: this.lineData.labels,
         datasets: [{
           label: 'Driving Profile - Metric',
           borderColor: 'rgba(33, 150, 243, 0.75)',
-          data: this.values.line.map(line => line.value),
+          data: this.lineData.values,
           fill: false,
           showLine: true,
           steppedLine: true,
