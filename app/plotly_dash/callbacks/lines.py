@@ -84,8 +84,8 @@ def register_line_graph_callbacks(dash_app):
                 item = {
                     'df': pd.DataFrame({
                         'x': indexes,
-                        'y': [state[attr] for state in car_states],
-                        'date': [state['date'] for state in car_states],
+                        'y': [getattr(state, attr, None) for state in car_states],
+                        'date': [state.date for state in car_states],
                     }),
                     'title': CHART_TYPE_MAP[attr],
                 }

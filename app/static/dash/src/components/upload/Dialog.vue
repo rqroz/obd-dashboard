@@ -68,7 +68,7 @@ export default {
       const formData = new FormData();
       formData.append('file', this.file);
 
-      const config = { headers: { 'Content-Type': 'multipart/form-data' } };
+      const config = { headers: { 'Content-Type': 'multipart/form-data' }, timeout: 30 * 1000 };
 
       this.$requests.post('/obd/upload/', formData, config)
         .then(() => {
